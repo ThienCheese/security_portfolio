@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Security portfolio for Nguyễn Thiện Chí: SOC, XDR, Active Directory threat detection, malware analysis, and detection engineering projects." />
+  <title>Nguyễn Thiện Chí | Security Portfolio</title>
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body data-page="home">
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <canvas id="noise-canvas" aria-hidden="true"></canvas>
+
+  <header class="site-header glass">
+    <a class="brand" href="index.html" aria-label="Home">
+      <span class="brand-mark">TC</span>
+      <span class="brand-text">Thiện Chí</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-label="Open navigation">☰</button>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="#projects">Projects</a>
+      <a href="#capabilities">Capabilities</a>
+      <a href="#resume">Resume Angle</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero section-padding">
+      <div class="hero-grid">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">SOC Analyst · Detection Engineering · Malware Analysis</p>
+          <h1>Security projects explained visually, not buried inside reports.</h1>
+          <p class="hero-subtitle">A portfolio site for lab-based security projects: Wazuh XDR architecture, ProxyNotShell attack-chain analysis, and Windows process injection detection. Built to help recruiters understand the system design, detection logic, and defensive value quickly.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#projects">View projects</a>
+            <a class="btn ghost" href="projects/process-injection.html">Open flagship research</a>
+          </div>
+          <div class="trust-row" aria-label="Highlights">
+            <span>IELTS 7.5</span>
+            <span>Information Security</span>
+            <span>SOC-ready labs</span>
+          </div>
+        </div>
+
+        <div class="hero-console reveal delay-1" aria-label="Animated SOC console">
+          <div class="console-top">
+            <span></span><span></span><span></span>
+            <p>security-portfolio</p>
+          </div>
+          <div class="terminal-lines">
+            <p><span class="muted">$</span> collect telemetry <span class="ok">endpoint</span> <span class="ok">web</span> <span class="ok">identity</span></p>
+            <p><span class="muted">$</span> correlate rules --mitre --risk</p>
+            <p><span class="muted">$</span> investigate alert --timeline</p>
+            <p><span class="muted">$</span> respond safely --contain --document</p>
+            <p class="typing"><span class="muted">$</span> ready_for_soc_role<span class="cursor">_</span></p>
+          </div>
+          <div class="signal-orbit" aria-hidden="true">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects" class="section-padding compact">
+      <div class="section-title reveal">
+        <p class="eyebrow">Selected lab work</p>
+        <h2>Three projects, three recruiter-friendly storylines</h2>
+        <p>Each page is designed like an interactive case study: architecture first, then detection logic, what I built, evidence, and SOC takeaways.</p>
+      </div>
+
+      <div class="project-grid">
+        <article class="project-card reveal">
+          <div class="card-icon xdr">XDR</div>
+          <p class="card-kicker">SIEM / XDR / Active Response</p>
+          <h3>Extended Detection & Response Architecture with Wazuh</h3>
+          <p>Multi-layer telemetry from endpoint, AD, web server, ModSecurity, pfSense/Suricata, and Wazuh Manager. Demonstrates detection, posture management, and controlled response.</p>
+          <div class="chip-row">
+            <span>Wazuh</span><span>FIM</span><span>SCA</span><span>pfSense</span><span>MITRE</span>
+          </div>
+          <a class="card-link" href="projects/wazuh-xdr.html">Explore case study →</a>
+        </article>
+
+        <article class="project-card reveal delay-1">
+          <div class="card-icon ad">AD</div>
+          <p class="card-kicker">AD attack-chain analysis</p>
+          <h3>ProxyNotShell Exploit Replication & AD Threat Detection</h3>
+          <p>Safe visual walkthrough of a lab attack chain from Exchange exposure to post-exploitation analysis, MITRE mapping, and defensive hunting opportunities.</p>
+          <div class="chip-row">
+            <span>Exchange</span><span>AD</span><span>BloodHound</span><span>Kerberos</span><span>IR</span>
+          </div>
+          <a class="card-link" href="projects/proxynotshell.html">Explore case study →</a>
+        </article>
+
+        <article class="project-card reveal delay-2">
+          <div class="card-icon mem">MEM</div>
+          <p class="card-kicker">Malware analysis / detection engineering</p>
+          <h3>Windows Defender Evasion & Process Injection Detection</h3>
+          <p>Research on process injection using native API concepts, then a defensive detector that monitors thread start addresses and private executable memory.</p>
+          <div class="chip-row">
+            <span>C++</span><span>Windows Internals</span><span>ETW</span><span>MEM_PRIVATE</span><span>Detection</span>
+          </div>
+          <a class="card-link" href="projects/process-injection.html">Explore case study →</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="capabilities" class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">Capabilities map</p>
+        <h2>What these projects prove</h2>
+      </div>
+      <div class="capability-map reveal">
+        <div class="capability-node active" data-cap="detect">Detect</div>
+        <div class="capability-node" data-cap="investigate">Investigate</div>
+        <div class="capability-node" data-cap="respond">Respond</div>
+        <div class="capability-node" data-cap="engineer">Engineer</div>
+        <div class="capability-panel">
+          <h3 id="cap-title">Detection logic</h3>
+          <p id="cap-desc">Correlating Windows event logs, Sysmon-style telemetry, WAF alerts, vulnerability context, and memory/thread artifacts into explainable security findings.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="resume" class="section-padding compact">
+      <div class="resume-banner reveal">
+        <div>
+          <p class="eyebrow">How to link this in CV</p>
+          <h2>Add one portfolio line under Projects</h2>
+          <p>Use this site as a visual substitute for long reports. It shows design thinking, defensive reasoning, and communication skill without exposing sensitive or weaponized implementation details.</p>
+        </div>
+        <div class="copy-card">
+          <button class="copy-btn" data-copy="Security Project Portfolio: Visual case studies covering Wazuh XDR, ProxyNotShell AD threat detection, and process injection detection. Available at: https://your-github-username.github.io/security-portfolio/">Copy CV line</button>
+          <code>Security Project Portfolio: Visual case studies covering Wazuh XDR, ProxyNotShell AD threat detection, and process injection detection.</code>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© 2026 Nguyễn Thiện Chí · Built as a safe, recruiter-facing security portfolio.</p>
+  </footer>
+
+  <script src="assets/js/app.js"></script>
+</body>
+</html>

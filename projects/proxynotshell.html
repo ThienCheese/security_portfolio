@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProxyNotShell AD Threat Detection | Security Portfolio</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body data-page="project">
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <canvas id="noise-canvas" aria-hidden="true"></canvas>
+  <header class="site-header glass">
+    <a class="brand" href="../index.html"><span class="brand-mark">TC</span><span class="brand-text">Thiện Chí</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-label="Open navigation">☰</button>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="../index.html#projects">Projects</a>
+      <a href="wazuh-xdr.html">Wazuh XDR</a>
+      <a href="process-injection.html">Process Injection</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="project-hero section-padding">
+      <div class="breadcrumb"><a href="../index.html">Home</a> / ProxyNotShell</div>
+      <div class="project-hero-grid">
+        <div class="reveal">
+          <p class="eyebrow">Red-to-Blue · Active Directory · Incident Analysis</p>
+          <h1>ProxyNotShell Exploit Replication & AD Threat Detection</h1>
+          <p class="hero-subtitle">A controlled lab that studies how Exchange exploitation can become an Active Directory compromise path, then translates each stage into artifacts, MITRE mapping, and hunting ideas.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#chain">Attack chain</a>
+            <a class="btn ghost" href="#mitre">MITRE map</a>
+          </div>
+        </div>
+        <div class="metric-stack reveal delay-1">
+          <div><strong>Exchange</strong><span>2016 CU23 lab target</span></div>
+          <div><strong>AD</strong><span>Domain compromise analysis</span></div>
+          <div><strong>Blue Team</strong><span>Artifacts → hunting logic</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="chain" class="section-padding compact">
+      <div class="section-title reveal">
+        <p class="eyebrow">Visual chain</p>
+        <h2>From exposure to domain risk</h2>
+        <p>This is a sanitized recruiter-facing flow. It explains the security reasoning without exposing step-by-step exploit commands.</p>
+      </div>
+      <div class="attack-chain reveal">
+        <div class="chain-step"><span>01</span><h3>Initial Foothold</h3><p>Social-engineering scenario and user execution in a closed lab.</p></div>
+        <div class="chain-step"><span>02</span><h3>Internal Discovery</h3><p>Identify Exchange, AD services, accounts, and reachable assets.</p></div>
+        <div class="chain-step"><span>03</span><h3>Exchange Abuse Path</h3><p>Study the ProxyNotShell concept: SSRF path plus backend execution risk.</p></div>
+        <div class="chain-step"><span>04</span><h3>Post-Exploitation</h3><p>Analyze persistence, credential exposure, and domain relationship mapping.</p></div>
+        <div class="chain-step"><span>05</span><h3>Detection & IR</h3><p>Translate behavior into logs, forensic artifacts, and hunting queries.</p></div>
+      </div>
+    </section>
+
+    <section class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">Hybrid lab design</p>
+        <h2>Cloud + local AD environment</h2>
+      </div>
+      <div class="network-map reveal">
+        <div class="zone zone-public">
+          <h3>Public</h3>
+          <p>Attacker workstation and C2 teamserver for controlled lab operation.</p>
+        </div>
+        <div class="zone zone-dmz">
+          <h3>DMZ</h3>
+          <p>Web-facing service used to represent an exposed perimeter layer.</p>
+        </div>
+        <div class="zone zone-internal">
+          <h3>Internal AD</h3>
+          <p>Exchange Server, Domain Controller, and Windows client joined to the lab domain.</p>
+        </div>
+        <div class="vpn-bridge">Secure lab bridge / VPN overlay</div>
+      </div>
+    </section>
+
+    <section id="mitre" class="section-padding compact">
+      <div class="section-title reveal">
+        <p class="eyebrow">MITRE ATT&CK mapping</p>
+        <h2>What behaviors were analyzed</h2>
+      </div>
+      <div class="mitre-grid reveal">
+        <div><span>Initial Access</span><strong>User execution / exposed service path</strong></div>
+        <div><span>Discovery</span><strong>Network, software, domain account and group discovery</strong></div>
+        <div><span>Execution</span><strong>PowerShell and native execution paths</strong></div>
+        <div><span>Defense Evasion</span><strong>Hidden execution, obfuscation, telemetry impairment</strong></div>
+        <div><span>Persistence</span><strong>Autostart and scheduled execution concepts</strong></div>
+        <div><span>Credential Access</span><strong>Credential dumping and Kerberos risk analysis</strong></div>
+        <div><span>Lateral Movement</span><strong>Remote service exploitation and alternate credentials</strong></div>
+      </div>
+    </section>
+
+    <section class="section-padding compact">
+      <div class="two-column reveal">
+        <div class="glass content-card">
+          <h2>Defensive outputs</h2>
+          <ul class="result-list">
+            <li>Registry integrity monitoring recommendations for autostart abuse.</li>
+            <li>API and call-stack visibility considerations for modern EDR.</li>
+            <li>Memory anomaly hunting for suspicious executable regions.</li>
+            <li>Application control recommendations such as WDAC/AppLocker.</li>
+            <li>Threat hunting ideas using Windows event IDs and AD replication indicators.</li>
+          </ul>
+        </div>
+        <div class="glass content-card">
+          <h2>What recruiters should see</h2>
+          <p>This project is not only offensive replication. The value is translating a full chain into detection opportunities, evidence collection, MITRE language, and containment recommendations.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a href="../index.html">← Back to all projects</a>
+  </footer>
+
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>

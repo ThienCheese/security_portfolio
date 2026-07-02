@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Process Injection Detection | Security Portfolio</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body data-page="project">
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <canvas id="noise-canvas" aria-hidden="true"></canvas>
+  <header class="site-header glass">
+    <a class="brand" href="../index.html"><span class="brand-mark">TC</span><span class="brand-text">Thiện Chí</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-label="Open navigation">☰</button>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="../index.html#projects">Projects</a>
+      <a href="wazuh-xdr.html">Wazuh XDR</a>
+      <a href="proxynotshell.html">ProxyNotShell</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="project-hero section-padding">
+      <div class="breadcrumb"><a href="../index.html">Home</a> / Process Injection</div>
+      <div class="project-hero-grid">
+        <div class="reveal">
+          <p class="eyebrow">Windows Internals · Malware Analysis · Detection Engineering</p>
+          <h1>Windows Defender Evasion & Process Injection Detection</h1>
+          <p class="hero-subtitle">A research project that studies process injection using native API concepts and turns the offensive understanding into a behavioral detector based on thread and memory artifacts.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#detector">Detector design</a>
+            <a class="btn ghost" href="https://github.com/ThienCheese/Bypass_" target="_blank" rel="noreferrer">GitHub repo</a>
+          </div>
+        </div>
+        <div class="metric-stack reveal delay-1">
+          <div><strong>3</strong><span>detection engines</span></div>
+          <div><strong>≤3s</strong><span>lab detection target</span></div>
+          <div><strong>T1055</strong><span>process injection focus</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">Research model</p>
+        <h2>Offensive concept → defensive signal</h2>
+      </div>
+      <div class="injection-flow reveal">
+        <div class="flow-lane attacker">
+          <h3>Loader behavior</h3>
+          <div class="flow-box">Environment check</div>
+          <div class="flow-box">Resolve native calls</div>
+          <div class="flow-box">Decrypt payload in memory</div>
+          <div class="flow-box">Inject into trusted process</div>
+        </div>
+        <div class="flow-lane detector">
+          <h3>Detector reasoning</h3>
+          <div class="flow-box">Track process/thread changes</div>
+          <div class="flow-box">Query thread start address</div>
+          <div class="flow-box">Inspect memory region</div>
+          <div class="flow-box">Alert on private executable memory</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="detector" class="section-padding compact">
+      <div class="section-title reveal">
+        <p class="eyebrow">Detector architecture</p>
+        <h2>Three complementary engines</h2>
+      </div>
+      <div class="engine-grid reveal">
+        <article class="engine-card">
+          <span>Engine 1</span>
+          <h3>ETW Kernel Trace</h3>
+          <p>Observes process events to provide context around parent-child relationships and suspicious process activity.</p>
+        </article>
+        <article class="engine-card featured">
+          <span>Engine 2</span>
+          <h3>Thread Polling</h3>
+          <p>Compares thread snapshots, detects new threads in sensitive processes, and checks whether the start address points to suspicious executable memory.</p>
+        </article>
+        <article class="engine-card">
+          <span>Engine 3</span>
+          <h3>Memory Scanner</h3>
+          <p>Scans target processes for committed private executable regions that are not backed by a legitimate image file.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">Detection rule of thumb</p>
+        <h2>Why MEM_PRIVATE matters</h2>
+      </div>
+      <div class="memory-visual reveal">
+        <div class="memory-bar image"><span>MEM_IMAGE</span><small>Normal code loaded from EXE/DLL</small></div>
+        <div class="memory-bar private pulse"><span>MEM_PRIVATE + EXECUTE</span><small>Suspicious for injected shellcode</small></div>
+        <div class="memory-bar heap"><span>MEM_PRIVATE + READ/WRITE</span><small>Common data/heap area</small></div>
+      </div>
+      <p class="center-note reveal">The detector does not rely on API hook visibility. It looks for runtime artifacts left after injection: new thread start address and executable private memory.</p>
+    </section>
+
+    <section class="section-padding compact">
+      <div class="two-column reveal">
+        <div class="glass content-card">
+          <h2>Experiment summary</h2>
+          <ul class="result-list">
+            <li>Traditional API-based injection was blocked by default protection.</li>
+            <li>Direct syscall concepts reduced user-mode hook visibility.</li>
+            <li>Full evasion chain succeeded in the lab, but still left memory/thread artifacts.</li>
+            <li>The custom detector identified the injected process using runtime behavior.</li>
+          </ul>
+        </div>
+        <div class="glass content-card">
+          <h2>Limitations and next steps</h2>
+          <p>Current detection focuses on private executable memory and classic remote thread patterns. Future work should cover module stomping, process hollowing, APC injection, call stack analysis, and event-driven monitoring for lower latency.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a href="../index.html">← Back to all projects</a>
+  </footer>
+
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wazuh XDR Architecture | Security Portfolio</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body data-page="project">
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <canvas id="noise-canvas" aria-hidden="true"></canvas>
+  <header class="site-header glass">
+    <a class="brand" href="../index.html"><span class="brand-mark">TC</span><span class="brand-text">Thiện Chí</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-label="Open navigation">☰</button>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="../index.html#projects">Projects</a>
+      <a href="proxynotshell.html">ProxyNotShell</a>
+      <a href="process-injection.html">Process Injection</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="project-hero section-padding">
+      <div class="breadcrumb"><a href="../index.html">Home</a> / Wazuh XDR</div>
+      <div class="project-hero-grid">
+        <div class="reveal">
+          <p class="eyebrow">SIEM · XDR · SOC Operations</p>
+          <h1>Extended Detection & Response Architecture with Wazuh</h1>
+          <p class="hero-subtitle">A multi-layer SOC lab that connects endpoint telemetry, web attack logs, network firewall signals, Active Directory authentication events, vulnerability context, and automated response.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#architecture">Architecture</a>
+            <a class="btn ghost" href="#scenarios">Demo scenarios</a>
+          </div>
+        </div>
+        <div class="metric-stack reveal delay-1">
+          <div><strong>4</strong><span>demo scenarios</span></div>
+          <div><strong>5</strong><span>XDR functions mapped</span></div>
+          <div><strong>Multi-layer</strong><span>endpoint · web · network · identity</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="architecture" class="section-padding compact">
+      <div class="section-title reveal">
+        <p class="eyebrow">Architecture</p>
+        <h2>From telemetry to action</h2>
+        <p>Click each node to understand its role in the lab.</p>
+      </div>
+      <div class="xdr-diagram reveal" data-diagram="wazuh">
+        <button class="diagram-node left-top active" data-title="Windows Agent" data-desc="Collects endpoint telemetry, file integrity monitoring events, and Windows Security logs.">Windows Agent</button>
+        <button class="diagram-node left-mid" data-title="Domain Controller" data-desc="Produces authentication events such as failed logons for brute-force detection.">Domain Controller</button>
+        <button class="diagram-node left-bottom" data-title="Web Server + ModSecurity" data-desc="Generates WAF logs for SQL injection and web attack attempts.">Web + WAF</button>
+        <button class="diagram-node center" data-title="Wazuh Manager" data-desc="Decodes logs, applies rules, correlates events, maps MITRE context, and triggers Active Response.">Wazuh Manager</button>
+        <button class="diagram-node right-top" data-title="Wazuh Indexer" data-desc="Stores searchable security data for investigation and dashboards.">Indexer</button>
+        <button class="diagram-node right-mid" data-title="Dashboard" data-desc="Shows alerts, CVEs, SCA results, and evidence of response.">Dashboard</button>
+        <button class="diagram-node right-bottom" data-title="pfSense / Suricata" data-desc="Receives firewall/network context and enforces network blocks through controlled response.">pfSense</button>
+        <svg class="diagram-lines" viewBox="0 0 1000 420" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M160 95 C320 95 345 190 460 190" />
+          <path d="M160 210 C300 210 340 200 460 200" />
+          <path d="M160 330 C310 330 345 225 460 215" />
+          <path d="M560 190 C640 115 700 95 835 95" />
+          <path d="M560 205 C650 205 710 210 835 210" />
+          <path d="M560 225 C650 300 710 325 835 325" />
+        </svg>
+        <aside class="diagram-info glass">
+          <h3>Windows Agent</h3>
+          <p>Collects endpoint telemetry, file integrity monitoring events, and Windows Security logs.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">XDR capability map</p>
+        <h2>Collect → Analyze → Protect → Respond → Report</h2>
+      </div>
+      <div class="pipeline reveal">
+        <div class="pipe-step"><span>01</span><h3>Collect</h3><p>Agent logs, syslog, WAF logs, endpoint events.</p></div>
+        <div class="pipe-step"><span>02</span><h3>Analyze</h3><p>Decoders, rules, correlation, MITRE mapping.</p></div>
+        <div class="pipe-step"><span>03</span><h3>Protect</h3><p>FIM, SCA, vulnerability detection, inventory.</p></div>
+        <div class="pipe-step"><span>04</span><h3>Respond</h3><p>Delete file, block IP, isolate endpoint, notify.</p></div>
+        <div class="pipe-step"><span>05</span><h3>Report</h3><p>Dashboard evidence, compliance, audit trail.</p></div>
+      </div>
+    </section>
+
+    <section id="scenarios" class="section-padding compact">
+      <div class="section-title reveal">
+        <p class="eyebrow">Demo scenarios</p>
+        <h2>What I demonstrated</h2>
+      </div>
+      <div class="scenario-tabs reveal">
+        <div class="tab-buttons" role="tablist" aria-label="Wazuh scenarios">
+          <button class="tab-btn active" data-tab="malware">Malware C2</button>
+          <button class="tab-btn" data-tab="posture">SCA + CVE</button>
+          <button class="tab-btn" data-tab="web">Web response</button>
+          <button class="tab-btn" data-tab="ad">AD brute-force</button>
+        </div>
+        <div class="tab-panel active" id="malware">
+          <h3>FIM + VirusTotal + Active Response</h3>
+          <p>When a suspicious file appears in a monitored folder, Wazuh enriches the alert with threat intelligence, raises severity, sends notification, and can trigger a controlled endpoint response.</p>
+          <ul class="result-list">
+            <li>Mapped file creation to malware reputation context.</li>
+            <li>Connected alert severity to response policy.</li>
+            <li>Documented email/dashboard evidence for analyst workflow.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="posture">
+          <h3>Security Configuration Assessment and vulnerability context</h3>
+          <p>The lab intentionally used weak password policy and outdated software to demonstrate how SOC visibility can include posture management, not only attack detection.</p>
+          <ul class="result-list">
+            <li>Tracked failed CIS-style checks and remediation guidance.</li>
+            <li>Mapped software inventory to CVE exposure.</li>
+            <li>Showed how risk can be prioritized before exploitation.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="web">
+          <h3>Web attack alert to firewall block</h3>
+          <p>ModSecurity generated web attack logs, Wazuh correlated the alert, and the response path demonstrated how a web-layer event can lead to a network-layer containment decision.</p>
+          <ul class="result-list">
+            <li>Correlated WAF logs with Wazuh rules.</li>
+            <li>Triggered controlled pfSense blocking.</li>
+            <li>Reduced detection-to-containment time in lab conditions.</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="ad">
+          <h3>Active Directory brute-force detection</h3>
+          <p>Repeated failed authentication generated Windows Security events. Wazuh correlation mapped the activity to credential access behavior and triggered endpoint containment in the lab.</p>
+          <ul class="result-list">
+            <li>Used Event ID 4625 as identity telemetry.</li>
+            <li>Mapped detection to brute-force technique context.</li>
+            <li>Validated network isolation through endpoint firewall state.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-padding compact">
+      <div class="takeaway-grid reveal">
+        <div>
+          <p class="eyebrow">SOC takeaway</p>
+          <h2>Why this matters for a SOC role</h2>
+          <p>This project shows I can reason across alert sources, understand when response automation is useful, and document evidence in a way that supports incident handling.</p>
+        </div>
+        <div class="safe-note">
+          <h3>Safe portfolio scope</h3>
+          <p>This page intentionally focuses on architecture, detection, and response outcomes. It avoids publishing weaponized scripts or operational attack instructions.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a href="../index.html">← Back to all projects</a>
+  </footer>
+
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>
