@@ -25,11 +25,11 @@
       <div class="project-hero-grid">
         <div class="reveal">
           <p class="eyebrow">SIEM · XDR · SOC Operations</p>
-          <h1>Extended Detection & Response Architecture with Wazuh</h1>
+          <h1>Wazuh XDR Architecture</h1>
           <p class="hero-subtitle">A multi-layer SOC lab that connects endpoint telemetry, web attack logs, network firewall signals, Active Directory authentication events, vulnerability context, and automated response.</p>
           <div class="hero-actions">
             <a class="btn primary" href="#architecture">Architecture</a>
-            <a class="btn ghost" href="#scenarios">Demo scenarios</a>
+            <a class="btn ghost" href="#flows">Scenario flows</a>
           </div>
         </div>
         <div class="metric-stack reveal delay-1">
@@ -83,61 +83,77 @@
       </div>
     </section>
 
-    <section id="scenarios" class="section-padding compact">
+    <section id="flows" class="section-padding compact">
       <div class="section-title reveal">
-        <p class="eyebrow">Demo scenarios</p>
-        <h2>What I demonstrated</h2>
+        <p class="eyebrow">Detailed scenario flowcharts</p>
+        <h2>How each demo works</h2>
+        <p>The diagrams below show the full path from event source to detection, response, and analyst evidence.</p>
       </div>
-      <div class="scenario-tabs reveal">
-        <div class="tab-buttons" role="tablist" aria-label="Wazuh scenarios">
-          <button class="tab-btn active" data-tab="malware">Malware C2</button>
-          <button class="tab-btn" data-tab="posture">SCA + CVE</button>
-          <button class="tab-btn" data-tab="web">Web response</button>
-          <button class="tab-btn" data-tab="ad">AD brute-force</button>
-        </div>
-        <div class="tab-panel active" id="malware">
-          <h3>FIM + VirusTotal + Active Response</h3>
-          <p>When a suspicious file appears in a monitored folder, Wazuh enriches the alert with threat intelligence, raises severity, sends notification, and can trigger a controlled endpoint response.</p>
-          <ul class="result-list">
-            <li>Mapped file creation to malware reputation context.</li>
-            <li>Connected alert severity to response policy.</li>
-            <li>Documented email/dashboard evidence for analyst workflow.</li>
-          </ul>
-        </div>
-        <div class="tab-panel" id="posture">
-          <h3>Security Configuration Assessment and vulnerability context</h3>
-          <p>The lab intentionally used weak password policy and outdated software to demonstrate how SOC visibility can include posture management, not only attack detection.</p>
-          <ul class="result-list">
-            <li>Tracked failed CIS-style checks and remediation guidance.</li>
-            <li>Mapped software inventory to CVE exposure.</li>
-            <li>Showed how risk can be prioritized before exploitation.</li>
-          </ul>
-        </div>
-        <div class="tab-panel" id="web">
-          <h3>Web attack alert to firewall block</h3>
-          <p>ModSecurity generated web attack logs, Wazuh correlated the alert, and the response path demonstrated how a web-layer event can lead to a network-layer containment decision.</p>
-          <ul class="result-list">
-            <li>Correlated WAF logs with Wazuh rules.</li>
-            <li>Triggered controlled pfSense blocking.</li>
-            <li>Reduced detection-to-containment time in lab conditions.</li>
-          </ul>
-        </div>
-        <div class="tab-panel" id="ad">
-          <h3>Active Directory brute-force detection</h3>
-          <p>Repeated failed authentication generated Windows Security events. Wazuh correlation mapped the activity to credential access behavior and triggered endpoint containment in the lab.</p>
-          <ul class="result-list">
-            <li>Used Event ID 4625 as identity telemetry.</li>
-            <li>Mapped detection to brute-force technique context.</li>
-            <li>Validated network isolation through endpoint firewall state.</li>
-          </ul>
-        </div>
+      <div class="scenario-flow-grid reveal">
+        <article class="scenario-flow-card">
+          <h3>1. Malware C2 detection and endpoint response</h3>
+          <div class="flowchart horizontal" style="--steps:6">
+            <div class="flow-step"><b>Source</b><h3>Suspicious file appears</h3><p>Endpoint folder is monitored by Wazuh FIM.</p></div>
+            <div class="flow-step"><b>Collect</b><h3>FIM alert</h3><p>File hash and path become investigation context.</p></div>
+            <div class="flow-step"><b>Enrich</b><h3>VirusTotal lookup</h3><p>External reputation converts file change into malware signal.</p></div>
+            <div class="flow-step"><b>Analyze</b><h3>High-severity rule</h3><p>Rule logic marks the event as response-worthy.</p></div>
+            <div class="flow-step"><b>Respond</b><h3>Controlled removal</h3><p>Active Response removes the malicious file in the lab.</p></div>
+            <div class="flow-step"><b>Report</b><h3>Email + dashboard</h3><p>Analyst receives alert evidence and audit trail.</p></div>
+          </div>
+        </article>
+
+        <article class="scenario-flow-card">
+          <h3>2. SCA and CVE posture management</h3>
+          <div class="flowchart horizontal" style="--steps:5">
+            <div class="flow-step"><b>Baseline</b><h3>Weak policy / old app</h3><p>Lab intentionally introduces risky configuration and software.</p></div>
+            <div class="flow-step"><b>Scan</b><h3>SCA + inventory</h3><p>Wazuh scans security configuration and installed packages.</p></div>
+            <div class="flow-step"><b>Match</b><h3>CIS + CVE context</h3><p>Failed checks and vulnerable software are mapped to risk.</p></div>
+            <div class="flow-step"><b>Prioritize</b><h3>Risk view</h3><p>Findings help fix exposure before active exploitation.</p></div>
+            <div class="flow-step"><b>Remediate</b><h3>Hardening path</h3><p>Dashboard gives evidence and remediation direction.</p></div>
+          </div>
+        </article>
+
+        <article class="scenario-flow-card">
+          <h3>3. Web attack alert to firewall block</h3>
+          <div class="flowchart horizontal" style="--steps:6">
+            <div class="flow-step"><b>Attack</b><h3>SQLi-style request</h3><p>Attacker traffic reaches the DMZ web application.</p></div>
+            <div class="flow-step"><b>Detect</b><h3>ModSecurity log</h3><p>WAF identifies abnormal web input and writes a log.</p></div>
+            <div class="flow-step"><b>Correlate</b><h3>Wazuh rule</h3><p>Web alert is converted into actionable security signal.</p></div>
+            <div class="flow-step"><b>Trigger</b><h3>Active Response</h3><p>Rule ID is tied to a controlled firewall action.</p></div>
+            <div class="flow-step"><b>Contain</b><h3>pfSense block</h3><p>Firewall prevents repeat access from the attacker source.</p></div>
+            <div class="flow-step"><b>Validate</b><h3>Rule evidence</h3><p>Dashboard and firewall state prove the response path.</p></div>
+          </div>
+        </article>
+
+        <article class="scenario-flow-card">
+          <h3>4. AD brute-force detection and endpoint isolation</h3>
+          <div class="flowchart horizontal" style="--steps:6">
+            <div class="flow-step"><b>Behavior</b><h3>Repeated failed logons</h3><p>Authentication failures target an AD account in the lab.</p></div>
+            <div class="flow-step"><b>Telemetry</b><h3>Windows Event 4625</h3><p>Domain Controller provides identity security evidence.</p></div>
+            <div class="flow-step"><b>Correlation</b><h3>Brute-force rule</h3><p>Wazuh groups failures and maps the behavior to credential access.</p></div>
+            <div class="flow-step"><b>Response</b><h3>Endpoint firewall policy</h3><p>Active Response changes firewall state on the suspected machine.</p></div>
+            <div class="flow-step"><b>Contain</b><h3>Inbound/outbound blocked</h3><p>The machine is isolated to limit continued password guessing.</p></div>
+            <div class="flow-step"><b>Evidence</b><h3>Ping failure + alert</h3><p>Network test and dashboard confirm containment.</p></div>
+          </div>
+        </article>
       </div>
     </section>
 
-  <footer class="site-footer">
-    <a href="../index.html">← Back to all projects</a>
-  </footer>
+    <section class="section-padding compact alt-section">
+      <div class="two-column reveal">
+        <div class="story-panel">
+          <h3>What I want to demonstrate</h3>
+          <p>This project is not only a tool installation. It shows the SOC workflow: collect telemetry, normalize it, map it to rule context, decide whether response is safe, and preserve evidence for investigation.</p>
+        </div>
+        <div class="story-panel safe-scope">
+          <h3>Production considerations</h3>
+          <p>For real environments, response rules need whitelist handling, rollback, alert tuning, change control, and incident lifecycle integration before automatic containment is enabled.</p>
+        </div>
+      </div>
+    </section>
+  </main>
 
+  <footer class="site-footer"><a href="../index.html">← Back to all projects</a></footer>
   <script src="../assets/js/app.js"></script>
 </body>
 </html>

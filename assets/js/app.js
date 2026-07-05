@@ -1,6 +1,4 @@
-const root = document.documentElement;
 const glow = document.querySelector('.cursor-glow');
-
 window.addEventListener('pointermove', (event) => {
   if (!glow) return;
   glow.style.left = `${event.clientX}px`;
@@ -15,7 +13,6 @@ const observer = new IntersectionObserver((entries) => {
     }
   });
 }, { threshold: 0.16 });
-
 document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
 
 const navToggle = document.querySelector('.nav-toggle');
@@ -28,24 +25,11 @@ if (navToggle && navLinks) {
 }
 
 const capabilityData = {
-  detect: {
-    title: 'Detection logic',
-    desc: 'Correlating Windows event logs, Sysmon-style telemetry, WAF alerts, vulnerability context, and memory/thread artifacts into explainable security findings.'
-  },
-  investigate: {
-    title: 'Investigation workflow',
-    desc: 'Building timelines from source event to alert, mapping evidence to MITRE ATT&CK, and documenting why the signal matters to an analyst.'
-  },
-  respond: {
-    title: 'Response thinking',
-    desc: 'Using controlled response paths such as notification, firewall block, file removal, and endpoint isolation while considering false positives and rollback.'
-  },
-  engineer: {
-    title: 'Detection engineering',
-    desc: 'Designing rules, detector logic, and architecture diagrams that convert red-team behavior into blue-team monitoring and containment capabilities.'
-  }
+  detect: { title: 'Detection logic', desc: 'Correlating endpoint, web, network, identity, and memory artifacts into explainable alerts.' },
+  investigate: { title: 'Investigation workflow', desc: 'Building timelines from source telemetry to MITRE context and analyst-ready evidence.' },
+  respond: { title: 'Response thinking', desc: 'Designing controlled containment paths such as notification, firewall block, file removal, and endpoint isolation.' },
+  engineer: { title: 'Detection engineering', desc: 'Converting offensive behavior into rules, dashboards, detector logic, and visual playbooks.' }
 };
-
 document.querySelectorAll('.capability-node').forEach((node) => {
   node.addEventListener('click', () => {
     document.querySelectorAll('.capability-node').forEach((n) => n.classList.remove('active'));
@@ -53,10 +37,7 @@ document.querySelectorAll('.capability-node').forEach((node) => {
     const content = capabilityData[node.dataset.cap];
     const title = document.getElementById('cap-title');
     const desc = document.getElementById('cap-desc');
-    if (content && title && desc) {
-      title.textContent = content.title;
-      desc.textContent = content.desc;
-    }
+    if (content && title && desc) { title.textContent = content.title; desc.textContent = content.desc; }
   });
 });
 
@@ -68,8 +49,10 @@ document.querySelectorAll('.diagram-node').forEach((node) => {
     node.classList.add('active');
     const info = diagram.querySelector('.diagram-info');
     if (info) {
-      info.querySelector('h3').textContent = node.dataset.title || node.textContent.trim();
-      info.querySelector('p').textContent = node.dataset.desc || '';
+      const h = info.querySelector('h3');
+      const p = info.querySelector('p');
+      if (h) h.textContent = node.dataset.title || node.textContent.trim();
+      if (p) p.textContent = node.dataset.desc || '';
     }
   });
 });
@@ -86,19 +69,6 @@ document.querySelectorAll('.tab-btn').forEach((button) => {
   });
 });
 
-document.querySelectorAll('.copy-btn').forEach((button) => {
-  button.addEventListener('click', async () => {
-    try {
-      await navigator.clipboard.writeText(button.dataset.copy || '');
-      const original = button.textContent;
-      button.textContent = 'Copied';
-      setTimeout(() => { button.textContent = original; }, 1300);
-    } catch (error) {
-      button.textContent = 'Copy manually';
-    }
-  });
-});
-
 const canvas = document.getElementById('noise-canvas');
 if (canvas) {
   const ctx = canvas.getContext('2d');
@@ -106,14 +76,11 @@ if (canvas) {
     const ratio = window.devicePixelRatio || 1;
     canvas.width = window.innerWidth * ratio;
     canvas.height = window.innerHeight * ratio;
-    ctx.scale(ratio, ratio);
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
     ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
     for (let i = 0; i < 90; i++) {
-      const x = Math.random() * window.innerWidth;
-      const y = Math.random() * window.innerHeight;
-      const alpha = Math.random() * 0.25;
-      ctx.fillStyle = `rgba(83, 229, 255, ${alpha})`;
-      ctx.fillRect(x, y, 1, 1);
+      ctx.fillStyle = `rgba(83, 229, 255, ${Math.random() * 0.25})`;
+      ctx.fillRect(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 1, 1);
     }
   };
   draw();
