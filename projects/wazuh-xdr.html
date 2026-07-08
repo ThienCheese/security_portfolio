@@ -26,15 +26,18 @@
         <div class="reveal">
           <p class="eyebrow">SIEM · XDR · SOC Operations</p>
           <h1>Wazuh XDR Architecture</h1>
-          <p class="hero-subtitle">A multi-layer SOC lab that connects endpoint telemetry, web attack logs, network firewall signals, Active Directory authentication events, vulnerability context, and automated response.</p>
+          <p class="hero-subtitle">A multi-layer SOC lab connecting endpoint telemetry, web attack logs, pfSense firewall signals, Active Directory authentication events, vulnerability context, VirusTotal enrichment, and Wazuh Active Response. This page is structured as a visual case study so recruiters can follow the detection path without reading the full report.</p>
           <div class="hero-actions">
             <a class="btn primary" href="#architecture">Architecture</a>
-            <a class="btn ghost" href="#flows">Scenario flows</a>
+            <a class="btn ghost" href="#scenarios">Scenario Evidence</a>
+          </div>
+          <div class="kpi-inline">
+            <span>Wazuh Manager</span><span>Windows Agent</span><span>pfSense + Suricata</span><span>ModSecurity</span><span>AD Event Logs</span>
           </div>
         </div>
         <div class="metric-stack reveal delay-1">
-          <div><strong>4</strong><span>demo scenarios</span></div>
-          <div><strong>5</strong><span>XDR functions mapped</span></div>
+          <div><strong>4</strong><span>demo scenarios </span></div>
+          <div><strong>5</strong><span>Collect → Analyze → Protect → Respond → Report</span></div>
           <div><strong>Multi-layer</strong><span>endpoint · web · network · identity</span></div>
         </div>
       </div>
@@ -43,30 +46,55 @@
     <section id="architecture" class="section-padding compact">
       <div class="section-title reveal">
         <p class="eyebrow">Architecture</p>
-        <h2>From telemetry to action</h2>
-        <p>Click each node to understand its role in the lab.</p>
+        <h2>Lab topology and telemetry path</h2>
+        <p>The lab was designed to make every alert traceable: which system generated the event, how Wazuh parsed it, which rule fired, what response was executed, and what evidence proves the response.</p>
       </div>
-      <div class="xdr-diagram reveal" data-diagram="wazuh">
-        <button class="diagram-node left-top active" data-title="Windows Agent" data-desc="Collects endpoint telemetry, file integrity monitoring events, and Windows Security logs.">Windows Agent</button>
-        <button class="diagram-node left-mid" data-title="Domain Controller" data-desc="Produces authentication events such as failed logons for brute-force detection.">Domain Controller</button>
-        <button class="diagram-node left-bottom" data-title="Web Server + ModSecurity" data-desc="Generates WAF logs for SQL injection and web attack attempts.">Web + WAF</button>
-        <button class="diagram-node center" data-title="Wazuh Manager" data-desc="Decodes logs, applies rules, correlates events, maps MITRE context, and triggers Active Response.">Wazuh Manager</button>
-        <button class="diagram-node right-top" data-title="Wazuh Indexer" data-desc="Stores searchable security data for investigation and dashboards.">Indexer</button>
-        <button class="diagram-node right-mid" data-title="Dashboard" data-desc="Shows alerts, CVEs, SCA results, and evidence of response.">Dashboard</button>
-        <button class="diagram-node right-bottom" data-title="pfSense / Suricata" data-desc="Receives firewall/network context and enforces network blocks through controlled response.">pfSense</button>
-        <svg class="diagram-lines" viewBox="0 0 1000 420" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M160 95 C320 95 345 190 460 190" />
-          <path d="M160 210 C300 210 340 200 460 200" />
-          <path d="M160 330 C310 330 345 225 460 215" />
-          <path d="M560 190 C640 115 700 95 835 95" />
-          <path d="M560 205 C650 205 710 210 835 210" />
-          <path d="M560 225 C650 300 710 325 835 325" />
-        </svg>
-        <aside class="diagram-info glass">
-          <h3>Windows Agent</h3>
-          <p>Collects endpoint telemetry, file integrity monitoring events, and Windows Security logs.</p>
-        </aside>
+
+      <div class="evidence-layout reveal">
+        <div class="story-panel">
+          <h3>What I deployed</h3>
+          <ul class="detail-list">
+            <li><strong>Attacker WAN:</strong> generated SQL injection, brute-force, and controlled malware test scenarios.</li>
+            <li><strong>pfSense + Suricata:</strong> central gateway, network sensor, syslog source, and firewall enforcement point.</li>
+            <li><strong>Web Server + ModSecurity:</strong> DMZ application layer producing WAF and Apache web-attack logs.</li>
+            <li><strong>Windows Client + Domain Controller:</strong> endpoint telemetry, FIM events, Windows Security Event ID 4625, and containment validation.</li>
+            <li><strong>Wazuh Manager:</strong> log collection, rule matching, correlation, MITRE mapping, integrations, notifications, and Active Response.</li>
+          </ul>
+          <table class="response-table">
+            <thead><tr><th>Source</th><th>Transport / Signal</th><th>Response</th></tr></thead>
+            <tbody>
+              <tr><td>Windows Client / DC</td><td>Agent logs over TCP 1514</td><td>Delete malware or isolate host with Windows Firewall</td></tr>
+              <tr><td>Web Server</td><td>Apache / ModSecurity logs</td><td>Trigger pfSense block for attacker IP</td></tr>
+              <tr><td>pfSense / Suricata</td><td>Syslog over UDP 514</td><td>Gateway-level visibility and enforcement</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="image-grid single">
+          <article class="image-card">
+            <figure>
+              <img src="../assets/images/wazuh/wazuh-topology-overview.png" alt="Wazuh lab topology with attacker, pfSense and Suricata, DMZ web server, LAN DC and client, and Wazuh Manager." />
+              <figcaption>High-level topology: WAN attacker, pfSense/Suricata gateway, DMZ web server, LAN DC/client, and Wazuh Manager.</figcaption>
+            </figure>
+          </article>
+        </div>
       </div>
+
+      <div class="mermaid-card reveal" style="margin-top:18px;">
+        <pre class="mermaid">
+flowchart TB
+  A["Attacker WAN<br/>192.168.100.156"] -->|"SQLi / brute-force / malware test"| FW{"pfSense + Suricata<br/>Central Gateway"}
+  FW -->|"Web traffic"| WEB["Web Server + ModSecurity<br/>DMZ 10.0.2.10"]
+  FW -->|"LAN traffic"| LAN["Windows Client + Domain Controller<br/>LAN 10.0.1.0/24"]
+  WEB -->|"ModSecurity and Apache logs"| WAZ["Wazuh Manager<br/>MGMT 10.0.3.10"]
+  LAN -->|"Agent logs TCP 1514<br/>FIM + Security Event Logs"| WAZ
+  FW -->|"Syslog / Suricata UDP 514"| WAZ
+  WAZ -->|"Index and search"| DASH["Wazuh Dashboard"]
+  WAZ -->|"Active Response: SSH block"| FW
+  WAZ -->|"Active Response: netsh / delete file"| LAN
+        </pre>
+      </div>
+      <figcaption>Detailed response path: agent logs, syslog, Wazuh correlation, pfSense block action, and Windows <code>netsh</code> isolation/removal.</figcaption>
+
     </section>
 
     <section class="section-padding compact alt-section">
@@ -75,85 +103,227 @@
         <h2>Collect → Analyze → Protect → Respond → Report</h2>
       </div>
       <div class="pipeline reveal">
-        <div class="pipe-step"><span>01</span><h3>Collect</h3><p>Agent logs, syslog, WAF logs, endpoint events.</p></div>
-        <div class="pipe-step"><span>02</span><h3>Analyze</h3><p>Decoders, rules, correlation, MITRE mapping.</p></div>
-        <div class="pipe-step"><span>03</span><h3>Protect</h3><p>FIM, SCA, vulnerability detection, inventory.</p></div>
-        <div class="pipe-step"><span>04</span><h3>Respond</h3><p>Delete file, block IP, isolate endpoint, notify.</p></div>
-        <div class="pipe-step"><span>05</span><h3>Report</h3><p>Dashboard evidence, compliance, audit trail.</p></div>
+        <div class="pipe-step"><span>01</span><h3>Collect</h3><p>Agent logs, syslog, WAF logs, FIM events, Windows Security logs.</p></div>
+        <div class="pipe-step"><span>02</span><h3>Analyze</h3><p>Decoders, rules, correlation, severity, MITRE mapping.</p></div>
+        <div class="pipe-step"><span>03</span><h3>Protect</h3><p>FIM, SCA, vulnerability detection, inventory, malware signals.</p></div>
+        <div class="pipe-step"><span>04</span><h3>Respond</h3><p>Delete file, block IP, isolate endpoint, notify analyst.</p></div>
+        <div class="pipe-step"><span>05</span><h3>Report</h3><p>Dashboard evidence, email notification, audit trail.</p></div>
       </div>
     </section>
 
-    <section id="flows" class="section-padding compact">
+    <section id="scenarios" class="section-padding compact">
       <div class="section-title reveal">
-        <p class="eyebrow">Detailed scenario flowcharts</p>
-        <h2>How each demo works</h2>
-        <p>The diagrams below show the full path from event source to detection, response, and analyst evidence.</p>
+        <h2>Detection flowcharts </h2>
       </div>
-      <div class="scenario-flow-grid reveal">
-        <article class="scenario-flow-card">
-          <h3>1. Malware C2 detection and endpoint response</h3>
-          <div class="flowchart horizontal" style="--steps:6">
-            <div class="flow-step"><b>Source</b><h3>Suspicious file appears</h3><p>Endpoint folder is monitored by Wazuh FIM.</p></div>
-            <div class="flow-step"><b>Collect</b><h3>FIM alert</h3><p>File hash and path become investigation context.</p></div>
-            <div class="flow-step"><b>Enrich</b><h3>VirusTotal lookup</h3><p>External reputation converts file change into malware signal.</p></div>
-            <div class="flow-step"><b>Analyze</b><h3>High-severity rule</h3><p>Rule logic marks the event as response-worthy.</p></div>
-            <div class="flow-step"><b>Respond</b><h3>Controlled removal</h3><p>Active Response removes the malicious file in the lab.</p></div>
-            <div class="flow-step"><b>Report</b><h3>Email + dashboard</h3><p>Analyst receives alert evidence and audit trail.</p></div>
-          </div>
-        </article>
 
-        <article class="scenario-flow-card">
-          <h3>2. SCA and CVE posture management</h3>
-          <div class="flowchart horizontal" style="--steps:5">
-            <div class="flow-step"><b>Baseline</b><h3>Weak policy / old app</h3><p>Lab intentionally introduces risky configuration and software.</p></div>
-            <div class="flow-step"><b>Scan</b><h3>SCA + inventory</h3><p>Wazuh scans security configuration and installed packages.</p></div>
-            <div class="flow-step"><b>Match</b><h3>CIS + CVE context</h3><p>Failed checks and vulnerable software are mapped to risk.</p></div>
-            <div class="flow-step"><b>Prioritize</b><h3>Risk view</h3><p>Findings help fix exposure before active exploitation.</p></div>
-            <div class="flow-step"><b>Remediate</b><h3>Hardening path</h3><p>Dashboard gives evidence and remediation direction.</p></div>
+      <article class="scenario-case reveal" id="malware-vt">
+        <p class="case-kicker">Scenario 1</p>
+        <h3>Malware C2 detection with FIM + VirusTotal + file removal</h3>
+        <p class="flow-note">Goal: detect a suspicious executable on a Windows client, enrich it with external threat intelligence, raise a high-severity alert, notify the analyst, and validate that the endpoint response can remove the file.</p>
+        <div class="case-grid">
+          <div class="case-flow">
+            <div class="mermaid-card compact">
+              <pre class="mermaid">
+flowchart LR
+  F["demon.exe appears on Windows Client"] --> A["Wazuh FIM records file path and hash"]
+  A --> V["VirusTotal integration checks file hash"]
+  V --> R["Rule 87105<br/>Alert level 12"]
+  R --> E["Email notification and dashboard evidence"]
+  R --> D["Active Response<br/>delete-malware script"]
+  D --> P["Endpoint proof:<br/>custom-delete.log success"]
+              </pre>
+            </div>
+            <div class="story-panel">
+              <h3>What the analyst sees</h3>
+              <ul class="detail-list">
+                <li><strong>Threat intel verdict:</strong> VirusTotal flags the sample, giving external context beyond local file creation.</li>
+                <li><strong>Wazuh fields:</strong> <code>data.integration=virustotal</code>, <code>positives=51</code>, <code>total=70</code>, source file path, hashes, and permalink.</li>
+                <li><strong>Rule evidence:</strong> Wazuh rule <strong>87105</strong> with alert level <strong>12</strong> is suitable for notification or controlled response.</li>
+                <li><strong>Response proof:</strong> the local custom delete log shows the malware file deletion workflow completed successfully.</li>
+              </ul>
+            </div>
           </div>
-        </article>
+          <div class="image-grid">
+            <article class="image-card full">
+              <span class="evidence-kicker">Threat intelligence</span>
+              <figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-virustotal-result.png" alt="VirusTotal result showing security vendors flagging demon.exe as malicious." /><figcaption>VirusTotal marks <code>demon.exe</code> as malicious, providing the external reputation signal.</figcaption></figure>
+            </article>
+            <article class="image-card full">
+              <span class="evidence-kicker">Wazuh enrichment fields</span>
+              <figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-virustotal-alert-log.png" alt="Wazuh VirusTotal alert fields showing malicious, total, positives, file path, and permalink." /><figcaption>The Wazuh event includes <code>malicious=1</code>, <code>positives=51</code>, <code>total=70</code>, source path, hash values, and a VirusTotal permalink.</figcaption></figure>
+            </article>
+            <article class="image-card full">
+              <span class="evidence-kicker">Analyst notification</span>
+              <figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-virustotal-email.png" alt="Wazuh email notification for VirusTotal alert." /><figcaption>Email notification gives an analyst-friendly summary: client IP, alert level, file path, hashes, and VirusTotal link.</figcaption></figure>
+            </article>
+            <article class="image-card full">
+              <span class="evidence-kicker">Endpoint response log</span>
+              <figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-delete-malware-log.png" alt="PowerShell output showing Wazuh custom delete malware script log and success message." /><figcaption>The custom delete log confirms the response script parsed the alert and deleted the suspicious file from the endpoint.</figcaption></figure>
+            </article>
+          </div>
+        </div>
+      </article>
 
-        <article class="scenario-flow-card">
-          <h3>3. Web attack alert to firewall block</h3>
-          <div class="flowchart horizontal" style="--steps:6">
-            <div class="flow-step"><b>Attack</b><h3>SQLi-style request</h3><p>Attacker traffic reaches the DMZ web application.</p></div>
-            <div class="flow-step"><b>Detect</b><h3>ModSecurity log</h3><p>WAF identifies abnormal web input and writes a log.</p></div>
-            <div class="flow-step"><b>Correlate</b><h3>Wazuh rule</h3><p>Web alert is converted into actionable security signal.</p></div>
-            <div class="flow-step"><b>Trigger</b><h3>Active Response</h3><p>Rule ID is tied to a controlled firewall action.</p></div>
-            <div class="flow-step"><b>Contain</b><h3>pfSense block</h3><p>Firewall prevents repeat access from the attacker source.</p></div>
-            <div class="flow-step"><b>Validate</b><h3>Rule evidence</h3><p>Dashboard and firewall state prove the response path.</p></div>
+      <article class="scenario-case reveal" id="sca-cve">
+        <p class="case-kicker">Scenario 2</p>
+        <h3>SCA and CVE posture management</h3>
+        <p class="flow-note">Goal: show that Wazuh can support proactive SOC work, not only attack detection. I intentionally used weak password policy and outdated software so Wazuh could surface configuration and CVE risk.</p>
+        <div class="case-grid">
+          <div class="case-flow">
+            <div class="mermaid-card compact">
+              <pre class="mermaid">
+flowchart LR
+  B["Weak password policy<br/>and old Notepad++"] --> S["SCA benchmark scan"]
+  B --> I["Software inventory scan"]
+  S --> C["Failed CIS check<br/>Minimum password length"]
+  I --> V["CVE matching<br/>Notepad++ 7.8"]
+  C --> R["Remediation guidance"]
+  V --> P["Prioritize high severity packages"]
+              </pre>
+            </div>
+            <div class="story-panel">
+              <h3>What the analyst sees</h3>
+              <ul class="detail-list">
+                <li><strong>Configuration evidence:</strong> password policy is intentionally weak, including minimum length of one character and disabled complexity.</li>
+                <li><strong>SCA result:</strong> the CIS Microsoft Windows Server 2022 benchmark shows a low score and many failed controls.</li>
+                <li><strong>Rule detail:</strong> the failed minimum password length check includes rationale, remediation, and compliance mapping.</li>
+                <li><strong>CVE evidence:</strong> Wazuh maps installed Notepad++ 7.8 to high-severity vulnerabilities for risk prioritization.</li>
+              </ul>
+            </div>
           </div>
-        </article>
+          <div class="image-grid">
+            <article class="image-card"><span class="evidence-kicker">Weak baseline</span><figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-password-policy-weak.png" alt="Local Group Policy Editor showing weak password policy." /><figcaption>Local policy intentionally weakens the password baseline for SCA validation.</figcaption></figure></article>
+            <article class="image-card"><span class="evidence-kicker">SCA score</span><figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-sca-score.png" alt="Wazuh SCA score showing passed, failed, and score." /><figcaption>Wazuh SCA dashboard shows the benchmark score and failed checks.</figcaption></figure></article>
+            <article class="image-card full"><span class="evidence-kicker">Failed control detail</span><figure><img class="full-proof" src="../assets/images/wazuh/wazuh-sca-min-password-detail.png" alt="Wazuh SCA detail for minimum password length check." /><figcaption>The check detail explains the rationale and remediation path for minimum password length.</figcaption></figure></article>
+            <article class="image-card"><span class="evidence-kicker">Vulnerability dashboard</span><figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-vulnerability-dashboard.png" alt="Wazuh vulnerability dashboard with severity counts." /><figcaption>Severity distribution helps triage vulnerable assets and packages.</figcaption></figure></article>
+            <article class="image-card"><span class="evidence-kicker">Package-level CVE</span><figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-cve-notepadpp.png" alt="Wazuh inventory showing Notepad++ CVEs." /><figcaption>Filtering on Notepad++ exposes package version and associated high-severity CVEs.</figcaption></figure></article>
+          </div>
+        </div>
+      </article>
 
-        <article class="scenario-flow-card">
-          <h3>4. AD brute-force detection and endpoint isolation</h3>
-          <div class="flowchart horizontal" style="--steps:6">
-            <div class="flow-step"><b>Behavior</b><h3>Repeated failed logons</h3><p>Authentication failures target an AD account in the lab.</p></div>
-            <div class="flow-step"><b>Telemetry</b><h3>Windows Event 4625</h3><p>Domain Controller provides identity security evidence.</p></div>
-            <div class="flow-step"><b>Correlation</b><h3>Brute-force rule</h3><p>Wazuh groups failures and maps the behavior to credential access.</p></div>
-            <div class="flow-step"><b>Response</b><h3>Endpoint firewall policy</h3><p>Active Response changes firewall state on the suspected machine.</p></div>
-            <div class="flow-step"><b>Contain</b><h3>Inbound/outbound blocked</h3><p>The machine is isolated to limit continued password guessing.</p></div>
-            <div class="flow-step"><b>Evidence</b><h3>Ping failure + alert</h3><p>Network test and dashboard confirm containment.</p></div>
+      <article class="scenario-case reveal" id="web-block">
+        <p class="case-kicker">Scenario 3</p>
+        <h3>Web attack alert to pfSense block</h3>
+        <p class="flow-note">Goal: connect an application-layer attack signal to a network-layer containment action. ModSecurity detects the SQL injection pattern, Wazuh correlates it, and a custom active-response script blocks the attacker IP on pfSense.</p>
+        <div class="case-grid">
+          <div class="case-flow">
+            <div class="mermaid-card compact">
+              <pre class="mermaid">
+flowchart LR
+  A["Attacker sends SQLi request<br/>192.168.100.156"] --> W["Web Server + ModSecurity<br/>writes access log"]
+  W --> Z["Wazuh parses web-accesslog"]
+  Z --> R["Rule 31164<br/>SQL injection attempt"]
+  R --> S["custom-pfsense-block.sh<br/>extracts source IP"]
+  S --> P["SSH to pfSense<br/>easyrule block WAN"]
+  P --> B["WAN alias contains<br/>192.168.100.156/32"]
+              </pre>
+            </div>
+            <div class="story-panel">
+              <h3>What the analyst sees</h3>
+              <ul class="detail-list">
+                <li><strong>Alert fields:</strong> Wazuh records the malicious request, source IP, rule description, rule ID, and MITRE mapping.</li>
+                <li><strong>Response log:</strong> the Wazuh active response log shows the custom script starting and successfully blocking <code>192.168.100.156</code>.</li>
+                <li><strong>Firewall proof:</strong> pfSense WAN rules show the attacker IP added to <code>EasyRuleBlockHostsWAN</code>.</li>
+                <li><strong>SOC value:</strong> this demonstrates cross-layer response: Web/WAF signal → Wazuh rule → network firewall containment.</li>
+              </ul>
+            </div>
           </div>
-        </article>
-      </div>
+          <div class="image-grid">
+            <article class="image-card full"><span class="evidence-kicker">Detection detail</span><figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-sqli-alert-details.png" alt="Wazuh SQL injection alert details with source IP and rule ID 31164." /><figcaption>Wazuh identifies a SQL injection attempt from <code>192.168.100.156</code> and maps it to rule <strong>31164</strong>.</figcaption></figure></article>
+            <article class="image-card full"><span class="evidence-kicker">Active Response log</span><figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-pfsense-active-response-log.png" alt="Wazuh active responses log showing custom-pfsense-block.sh success." /><figcaption>The custom script logs <strong>SUCCESS - Da block 192.168.100.156</strong>, proving the response executed.</figcaption></figure></article>
+            <article class="image-card full"><span class="evidence-kicker">Firewall enforcement</span><figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-pfsense-wan-block.png" alt="pfSense firewall WAN rules with EasyRuleBlockHostsWAN alias containing 192.168.100.156/32." /><figcaption>pfSense WAN rule evidence shows the attacker IP inserted into the block alias.</figcaption></figure></article>
+          </div>
+        </div>
+      </article>
+
+      <article class="scenario-case reveal" id="ad-bruteforce">
+        <p class="case-kicker">Scenario 4</p>
+        <h3>Active Directory brute-force detection and endpoint isolation</h3>
+        <p class="flow-note">Goal: detect repeated Windows logon failures against an AD account, map the behavior to brute-force / credential access, and validate containment through Windows Firewall and network failure evidence.</p>
+        <div class="case-grid">
+          <div class="case-flow">
+            <div class="mermaid-card compact">
+              <pre class="mermaid">
+flowchart LR
+  T["Repeated invalid logons<br/>Administrator"] --> E["Domain Controller logs<br/>Event ID 4625"]
+  E --> W["Wazuh Agent forwards<br/>Windows Security logs"]
+  W --> R["Rule 60204<br/>Multiple logon failures"]
+  R --> M["MITRE T1110<br/>Credential Access"]
+  R --> N["Active Response<br/>netsh.exe"]
+  N --> F["Windows Firewall rule<br/>block inbound and outbound"]
+  F --> V["Validation:<br/>ping General failure"]
+              </pre>
+            </div>
+            <div class="story-panel">
+              <h3>What the analyst sees</h3>
+              <ul class="detail-list">
+                <li><strong>Identity telemetry:</strong> repeated failed logons generate Windows Security Event ID <strong>4625</strong> on the Domain Controller.</li>
+                <li><strong>Correlation:</strong> Wazuh rule <strong>60204</strong> groups multiple failures and maps them to MITRE <strong>T1110 Brute Force</strong>.</li>
+                <li><strong>Response:</strong> Wazuh executes the <code>netsh.exe</code> active response module.</li>
+                <li><strong>Containment proof:</strong> Windows Firewall blocks inbound and outbound connections, and ping to the gateway returns <code>General failure</code>.</li>
+              </ul>
+            </div>
+          </div>
+          <div class="image-grid">
+            <article class="image-card full"><span class="evidence-kicker">Correlation alert</span><figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-rule-60204-bruteforce.png" alt="Wazuh dashboard details for rule 60204 brute force alert." /><figcaption>Wazuh creates rule <strong>60204</strong>, level <strong>10</strong>, mapped to <strong>T1110 Brute Force</strong>.</figcaption></figure></article>
+            <article class="image-card full"><span class="evidence-kicker">Active Response execution</span><figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-netsh-active-response-log.png" alt="Wazuh active response log showing netsh.exe starting for multiple Windows logon failures." /><figcaption>The active-response log shows <code>netsh.exe</code> starting for the multiple Windows logon failures alert.</figcaption></figure></article>
+            <article class="image-card"><span class="evidence-kicker">Firewall isolation</span><figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-windows-firewall-block-mode.png" alt="Windows Defender Firewall showing inbound and outbound connections blocked." /><figcaption>Windows Firewall profiles are switched to block inbound and outbound connections.</figcaption></figure></article>
+            <article class="image-card"><span class="evidence-kicker">Network validation</span><figure><img class="wide-proof" src="../assets/images/wazuh/wazuh-ping-general-failure.png" alt="PowerShell ping to gateway returning General failure." /><figcaption><code>ping 10.0.1.1</code> returns <strong>General failure</strong>, validating endpoint isolation.</figcaption></figure></article>
+          </div>
+        </div>
+      </article>
     </section>
 
     <section class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">SOC value</p>
+      </div>
       <div class="two-column reveal">
-        <div class="story-panel">
-          <h3>What I want to demonstrate</h3>
-          <p>This project is not only a tool installation. It shows the SOC workflow: collect telemetry, normalize it, map it to rule context, decide whether response is safe, and preserve evidence for investigation.</p>
+        <div class="glass content-card">
+          <h2>Detection engineering skills</h2>
+          <ul class="result-list">
+            <li>Mapped raw logs into Wazuh rules, severity, MITRE context, and analyst-readable evidence.</li>
+            <li>Validated multiple telemetry types: FIM, VirusTotal enrichment, ModSecurity logs, Windows Security logs, SCA, and CVE data.</li>
+            <li>Explained why each signal matters and what an analyst should inspect during triage.</li>
+          </ul>
         </div>
-        <div class="story-panel safe-scope">
-          <h3>Production considerations</h3>
-          <p>For real environments, response rules need whitelist handling, rollback, alert tuning, change control, and incident lifecycle integration before automatic containment is enabled.</p>
+        <div class="glass content-card">
+          <h2>Response engineering skills</h2>
+          <ul class="result-list">
+            <li>Implemented controlled Active Response for file deletion, pfSense blocking, and Windows Firewall isolation.</li>
+            <li>Collected proof of response through dashboard fields, active response logs, firewall state, and connectivity tests.</li>
+            <li>Understood production limitations: whitelist, rollback, tuning, and change control are required before automatic blocking in real environments.</li>
+          </ul>
         </div>
       </div>
     </section>
   </main>
 
   <footer class="site-footer"><a href="../index.html">← Back to all projects</a></footer>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    securityLevel: 'loose',
+    flowchart: {
+      useMaxWidth: false,
+      htmlLabels: true,
+      nodeSpacing: 55,
+      rankSpacing: 70,
+      padding: 20,
+      curve: 'basis'
+    },
+    themeVariables: {
+      fontFamily: 'Inter, Arial, sans-serif',
+      fontSize: '17px',
+      primaryColor: '#f4f0ff',
+      primaryTextColor: '#1f2430',
+      primaryBorderColor: '#9b7cff',
+      lineColor: '#3b4154'
+    }
+  });
+</script>
   <script src="../assets/js/app.js"></script>
 </body>
 </html>

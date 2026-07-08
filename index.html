@@ -18,7 +18,6 @@
     </a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-label="Open navigation">☰</button>
     <nav class="nav-links" aria-label="Primary navigation">
-      <a href="#about">About</a>
       <a href="#projects">Projects</a>
       <a href="#capabilities">Capabilities</a>
     </nav>
@@ -28,16 +27,16 @@
     <section class="hero section-padding">
       <div class="hero-grid">
         <div class="hero-copy reveal">
-          <p class="eyebrow">SOC Analyst · Red-to-Blue Research · Detection Engineering</p>
-          <h1>Security Portfolio</h1>
-          <p class="hero-subtitle">I am a final-year Information Security student at UIT, aiming for a SOC Analyst role. This site turns my main lab projects into visual case studies as to represent the architecture, attack flow, detection logic, and what I personally built.</p>
+          <p class="eyebrow">SOC Analyst · Detection Engineering · Malware Analysis</p>
+          <h1>My CyberSecurity projects</h1>
+          <p class="hero-subtitle">A portfolio site for lab-based security projects: Wazuh XDR architecture, ProxyNotShell attack-chain analysis, and Windows process injection detection. </p>
           <div class="hero-actions">
             <a class="btn primary" href="#projects">View projects</a>
-            <a class="btn ghost" href="#about">About me</a>
           </div>
           <div class="trust-row" aria-label="Highlights">
-            <span>Information Security · UIT</span>
-            <span>SOC / Malware / AD Security</span>
+            <span>IELTS 7.5</span>
+            <span>Information Security</span>
+            <span>UIT</span>
           </div>
         </div>
 
@@ -47,10 +46,10 @@
             <p>security-portfolio</p>
           </div>
           <div class="terminal-lines">
-            <p><span class="muted">$</span> profile --focus <span class="ok">SOC</span> <span class="ok">malware</span> <span class="ok">AD</span></p>
-            <p><span class="muted">$</span> projects --mode visual-case-study</p>
-            <p><span class="muted">$</span> map attack-flow --to detection</p>
-            <p><span class="muted">$</span> document evidence </p>
+            <p><span class="muted">$</span> collect telemetry <span class="ok">endpoint</span> <span class="ok">web</span> <span class="ok">identity</span></p>
+            <p><span class="muted">$</span> correlate rules --mitre --risk</p>
+            <p><span class="muted">$</span> investigate alert --timeline</p>
+            <p><span class="muted">$</span> respond safely --contain --document</p>
             <p class="typing"><span class="muted">$</span> ready_for_soc_role<span class="cursor">_</span></p>
           </div>
           <div class="signal-orbit" aria-hidden="true">
@@ -60,54 +59,43 @@
       </div>
     </section>
 
-    <section id="about" class="section-padding compact alt-section">
-      <div class="two-column">
-        <div class="profile-card reveal">
-          <p class="eyebrow">Brief introduction</p>
-          <h2>Final-year Information Security student with hands-on red and blue lab experience.</h2>
-          <p>I focus on understanding attacker behavior deeply enough to design better detection and response. My strongest areas are SIEM/XDR deployment, Windows/AD attack analysis, malware behavior, and translating technical findings into clear investigation stories.</p>
-          <div class="profile-grid">
-            <div class="profile-pill"><strong>Target role</strong><span>SOC Analyst / Detection Engineering Intern</span></div>
-            <div class="profile-pill"><strong>Core mindset</strong><span>Offensive insight → defensive signal</span></div>
-            <div class="profile-pill"><strong>Tools</strong><span>Wazuh, ELK/Splunk, Sysmon, Burp, Impacket, BloodHound</span></div>
-            <div class="profile-pill"><strong>Languages</strong><span>Vietnamese native · English IELTS 7.5</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section id="projects" class="section-padding compact">
       <div class="section-title reveal">
         <p class="eyebrow">Selected lab work</p>
-        <h2>Visual project case studies</h2>
-        <p>Each page is organized as architecture, scenario flowcharts, key concepts, actions performed, evidence, and SOC takeaways.</p>
+        <p>Each page is designed like an interactive case study: architecture first, then detection logic, evidence, and SOC takeaways.</p>
       </div>
 
       <div class="project-grid">
-        <article class="project-card compact-title reveal">
+        <article class="project-card reveal">
           <div class="card-icon xdr">XDR</div>
           <p class="card-kicker">SIEM / XDR / Active Response</p>
-          <h3>Wazuh XDR Architecture</h3>
+          <h3>Extended Detection & Response Architecture with Wazuh</h3>
           <p>Multi-layer telemetry from endpoint, AD, web server, ModSecurity, pfSense/Suricata, and Wazuh Manager. Demonstrates detection, posture management, and controlled response.</p>
-          <div class="chip-row"><span>Wazuh</span><span>FIM</span><span>SCA</span><span>pfSense</span><span>MITRE</span></div>
+          <div class="chip-row">
+            <span>Wazuh</span><span>FIM</span><span>SCA</span><span>pfSense</span><span>MITRE</span>
+          </div>
           <a class="card-link" href="projects/wazuh-xdr.html">Explore →</a>
         </article>
 
-        <article class="project-card compact-title reveal delay-1">
+        <article class="project-card reveal delay-1">
           <div class="card-icon ad">AD</div>
           <p class="card-kicker">AD attack-chain analysis</p>
-          <h3>ProxyNotShell & AD Detection</h3>
+          <h3>ProxyNotShell Exploit Replication & AD Threat Detection</h3>
           <p>Safe visual walkthrough of a lab attack chain from Exchange exposure to post-exploitation analysis, MITRE mapping, and defensive hunting opportunities.</p>
-          <div class="chip-row"><span>Exchange</span><span>AD</span><span>BloodHound</span><span>Kerberos</span><span>IR</span></div>
+          <div class="chip-row">
+            <span>Exchange</span><span>AD</span><span>BloodHound</span><span>Kerberos</span><span>IR</span>
+          </div>
           <a class="card-link" href="projects/proxynotshell.html">Explore →</a>
         </article>
 
-        <article class="project-card compact-title reveal delay-2">
-          <div class="card-icon mem">MEM</div>
-          <p class="card-kicker">Malware analysis / red-to-blue</p>
-          <h3>Defender Evasion & Injection Detection</h3>
-          <p>Red-team focused process injection research using native API concepts, followed by a detector that monitors thread start addresses and private executable memory.</p>
-          <div class="chip-row"><span>C++</span><span>Windows Internals</span><span>ETW</span><span>MEM_PRIVATE</span><span>Detection</span></div>
+        <article class="project-card reveal delay-2">
+          <div class="card-icon mem">Injection</div>
+          <p class="card-kicker">Malware analysis / detection engineering</p>
+          <h3>Windows Defender Evasion & Process Injection Detection</h3>
+          <p>Research on process injection using native API concepts, then a defensive detector that monitors thread start addresses and private executable memory.</p>
+          <div class="chip-row">
+            <span>C++</span><span>Windows Internals</span><span>ETW</span><span>MEM_PRIVATE</span><span>Detection</span>
+          </div>
           <a class="card-link" href="projects/process-injection.html">Explore →</a>
         </article>
       </div>
@@ -125,14 +113,14 @@
         <div class="capability-node" data-cap="engineer">Engineer</div>
         <div class="capability-panel">
           <h3 id="cap-title">Detection logic</h3>
-          <p id="cap-desc">Correlating endpoint, web, network, identity, and memory artifacts into explainable alerts.</p>
+          <p id="cap-desc">Correlating Windows event logs, Sysmon-style telemetry, WAF alerts, vulnerability context, and memory/thread artifacts into explainable security findings.</p>
         </div>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
-    <p>© 2026 Nguyễn Thiện Chí · Security Portfolio</p>
+    <p>© 2026 Nguyễn Thiện Chí ·</p>
   </footer>
 
   <script src="assets/js/app.js"></script>

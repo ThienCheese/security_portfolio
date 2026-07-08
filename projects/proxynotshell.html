@@ -26,31 +26,31 @@
         <div class="reveal">
           <p class="eyebrow">Red-to-Blue · Active Directory · Incident Analysis</p>
           <h1>ProxyNotShell & AD Threat Detection</h1>
-          <p class="hero-subtitle">A controlled lab that studies how Exchange exploitation can become an Active Directory compromise path, then translates each stage into artifacts, MITRE mapping, and hunting ideas.</p>
+          <p class="hero-subtitle">A controlled Exchange/Active Directory lab that studies how an authenticated Exchange exploitation path can lead to domain-level compromise, then converts each stage into artifacts, MITRE mapping, and SOC hunting ideas. The public page intentionally avoids exploit commands and focuses on behavior, evidence, and defender thinking.</p>
           <div class="hero-actions">
             <a class="btn primary" href="#chain">Attack chain</a>
-            <a class="btn ghost" href="#flows">Detailed flows</a>
+            <a class="btn ghost" href="#blue-view">Blue-team view</a>
           </div>
         </div>
         <div class="metric-stack reveal delay-1">
-          <div><strong>Exchange</strong><span>2016 CU23 lab target</span></div>
-          <div><strong>AD</strong><span>Domain compromise analysis</span></div>
-          <div><strong>Red → Blue</strong><span>Artifacts → hunting logic</span></div>
+          <div><strong>Hybrid</strong><span>Cloud + local VMware AD lab</span></div>
+          <div><strong>Full-chain</strong><span>Foothold → Exchange → Domain risk</span></div>
+          <div><strong>Red → Blue</strong><span>Actions → artifacts → hunting logic</span></div>
         </div>
       </div>
     </section>
 
     <section id="chain" class="section-padding compact">
       <div class="section-title reveal">
-        <p class="eyebrow">Visual chain</p>
-        <h2>From exposure to domain risk</h2>
+        <p class="eyebrow">Scenario overview</p>
+        <h2>From initial foothold to domain risk</h2>
       </div>
       <div class="attack-chain reveal">
-        <div class="chain-step"><span>01</span><h3>Initial Foothold</h3><p>Controlled social-engineering scenario and user execution in a closed lab.</p></div>
-        <div class="chain-step"><span>02</span><h3>Internal Discovery</h3><p>Identify Exchange, AD services, accounts, and reachable assets.</p></div>
-        <div class="chain-step"><span>03</span><h3>Exchange Abuse Path</h3><p>Study the ProxyNotShell concept: SSRF path plus backend execution risk.</p></div>
-        <div class="chain-step"><span>04</span><h3>Post-Exploitation</h3><p>Analyze persistence, credential exposure, domain relationship mapping, and Kerberos risk.</p></div>
-        <div class="chain-step"><span>05</span><h3>Detection & IR</h3><p>Translate behavior into logs, forensic artifacts, and hunting queries.</p></div>
+        <div class="chain-step"><span>01</span><h3>Initial Foothold</h3><p>Controlled social-engineering scenario and user execution in an isolated lab.</p></div>
+        <div class="chain-step"><span>02</span><h3>Internal Discovery</h3><p>Identify Exchange, AD services, accounts, groups, software, and reachable hosts.</p></div>
+        <div class="chain-step"><span>03</span><h3>Exchange Path</h3><p>Study ProxyNotShell as an authenticated SSRF path plus backend execution risk.</p></div>
+        <div class="chain-step"><span>04</span><h3>Post-Exploitation</h3><p>Analyze persistence, credential exposure, domain graph, DCSync, and Kerberos abuse.</p></div>
+        <div class="chain-step"><span>05</span><h3>Detection & IR</h3><p>Translate behavior into Windows logs, forensic artifacts, MITRE mapping, and response ideas.</p></div>
       </div>
     </section>
 
@@ -58,85 +58,112 @@
       <div class="section-title reveal">
         <p class="eyebrow">Hybrid lab design</p>
         <h2>Cloud + local AD environment</h2>
+        <p>The lab combines public cloud machines and local VMware systems through a VPN overlay, simulating a realistic path from perimeter access into an internal Active Directory environment.</p>
       </div>
       <div class="network-map reveal">
-        <div class="zone zone-public"><h3>Public</h3><p>Attacker workstation and C2 teamserver for controlled lab operation.</p></div>
-        <div class="zone zone-dmz"><h3>DMZ</h3><p>Web-facing service used to represent an exposed perimeter layer.</p></div>
-        <div class="zone zone-internal"><h3>Internal AD</h3><p>Exchange Server, Domain Controller, and Windows client joined to the lab domain.</p></div>
-        <div class="vpn-bridge">Secure lab bridge / VPN overlay</div>
+        <div class="zone zone-public"><h3>Public</h3><p>Havoc C2 teamserver and attacker client used for controlled operator workflow and callback management.</p></div>
+        <div class="zone zone-dmz"><h3>DMZ</h3><p>Web-facing service used as a perimeter layer before reaching internal assets.</p></div>
+        <div class="zone zone-internal"><h3>Internal AD</h3><p>Exchange 2016 CU23, Domain Controller, and Windows client joined to the lab domain.</p></div>
+        <div class="vpn-bridge">Tailscale / VPN overlay for hybrid lab connectivity</div>
       </div>
     </section>
 
-    <section id="flows" class="section-padding compact">
+    <section class="section-padding compact">
       <div class="section-title reveal">
-        <p class="eyebrow">Detailed scenario flowcharts</p>
-        <h2>Attack flow and defender view</h2>
-        <p>The page avoids publishing exploit commands. It focuses on the chain of behavior, artifacts, and detection opportunities.</p>
+        <p class="eyebrow">Overview</p>
+        <h2>Behavioral attack chain</h2>
       </div>
+      <div class="mermaid-card reveal">
+        <pre class="mermaid">
+flowchart LR
+  U[Execution\nFile opened] --> C2[C2 established]
+  C2 --> DISC[Internal discovery\nExchange + AD mapping]
+  DISC --> EX[Exchange exploitation path\nCVE-2022-41040 / 41082 concept]
+  EX --> SYS[High-privilege shell on Exchange]
+  SYS --> PERSIST[Persistence + defense evasion]
+  SYS --> BH[SharpHound / BloodHound\ndomain mapping]
+  SYS --> LSASS[Credential \nLSASS dump analysis]
+  LSASS --> DCS[DCSync / krbtgt hash risk]
+  DCS --> GT[Golden Ticket / Pass-the-Ticket impact]
+  GT --> DA[Domain Admin-level access risk]
+        </pre>
+      </div>
+    </section>
 
+    <section id="blue-view" class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">Defender view</p>
+        <h2>Artifacts and hunting opportunities</h2>
+        <p>The value of this project is not only reproducing the chain. It also shows how to translate attacker behavior into SOC evidence.</p>
+      </div>
       <div class="scenario-flow-grid reveal">
         <article class="scenario-flow-card">
-          <h3>Red team chain: foothold to domain control</h3>
+          <h3>Red-team behavior → Blue-team artifacts</h3>
           <div class="flowchart horizontal" style="--steps:7">
-            <div class="flow-step"><b>01</b><h3>User execution</h3><p>Lab scenario starts from a believable file-opening lure.</p></div>
-            <div class="flow-step"><b>02</b><h3>C2 session</h3><p>Operator gains controlled access for internal enumeration.</p></div>
-            <div class="flow-step"><b>03</b><h3>Discovery</h3><p>Exchange endpoints, AD objects, and reachable services are identified.</p></div>
-            <div class="flow-step"><b>04</b><h3>Exchange path</h3><p>ProxyNotShell concept is studied as authenticated SSRF to backend execution risk.</p></div>
-            <div class="flow-step"><b>05</b><h3>Persistence</h3><p>Persistence behavior is analyzed as an indicator source.</p></div>
-            <div class="flow-step"><b>06</b><h3>Credential access</h3><p>Credential material and AD replication abuse become critical domain risks.</p></div>
-            <div class="flow-step"><b>07</b><h3>Domain impact</h3><p>Kerberos ticket abuse demonstrates why Exchange compromise can be severe.</p></div>
+            <div class="flow-step"><b>Execution</b><h3>File opened</h3><p>Process creation, unusual parent-child process chain, hidden-window behavior.</p></div>
+            <div class="flow-step"><b>C2</b><h3>Beaconing</h3><p>Outbound callback, suspicious sleep/jitter, unusual endpoint network flow.</p></div>
+            <div class="flow-step"><b>Discovery</b><h3>AD mapping</h3><p>LDAP/RPC queries, SharpHound-style collection, account/group enumeration.</p></div>
+            <div class="flow-step"><b>Exchange</b><h3>Service abuse</h3><p>IIS/Exchange endpoint patterns, remote PowerShell behavior, new process execution.</p></div>
+            <div class="flow-step"><b>Persistence</b><h3>Scheduled task</h3><p>New task creation, suspicious path, SYSTEM execution context.</p></div>
+            <div class="flow-step"><b>Credential</b><h3>LSASS / DCSync</h3><p>LSASS access, 4662 directory replication indicators, sensitive privilege usage.</p></div>
+            <div class="flow-step"><b>Kerberos</b><h3>Ticket abuse</h3><p>NewCredentials logon, abnormal Kerberos ticket use, privileged session creation.</p></div>
           </div>
         </article>
+      </div>
 
-        <article class="scenario-flow-card">
-          <h3>Blue team chain: artifact to hunting logic</h3>
-          <div class="flowchart horizontal" style="--steps:7">
-            <div class="flow-step"><b>Log</b><h3>User execution trail</h3><p>Process creation, file execution, and persistence locations.</p></div>
-            <div class="flow-step"><b>Network</b><h3>C2 and discovery</h3><p>Unexpected beaconing, scanning, or internal service enumeration.</p></div>
-            <div class="flow-step"><b>Web</b><h3>Exchange/IIS clues</h3><p>Suspicious Exchange endpoint patterns and PowerShell backend behavior.</p></div>
-            <div class="flow-step"><b>Endpoint</b><h3>Tool staging</h3><p>New binaries, archive extraction, Defender exclusion attempts.</p></div>
-            <div class="flow-step"><b>Identity</b><h3>Credential access</h3><p>LSASS access, abnormal logon type, and privilege usage.</p></div>
-            <div class="flow-step"><b>AD</b><h3>Replication indicators</h3><p>DCSync-style activity and sensitive directory permission usage.</p></div>
-            <div class="flow-step"><b>IR</b><h3>Contain & scope</h3><p>Reset credentials, isolate affected hosts, and review Kerberos trust impact.</p></div>
-          </div>
-        </article>
+      <div class="mermaid-card reveal" style="margin-top:18px;">
+        <pre class="mermaid">
+flowchart TB
+  A[Raw telemetry] --> B{Triage question}
+  B -->|Endpoint| E[Process tree\nnew file\nscheduled task\nDefender exclusion]
+  B -->|Identity| I[4624 / 4625 / 4672\n4662 DCSync indicators\nKerberos events]
+  B -->|Network| N[C2 callback\ninternal discovery\nExchange access]
+  B -->|Application| W[IIS / Exchange logs\nAutodiscover / PowerShell patterns]
+  E --> H[Hunting hypothesis]
+  I --> H
+  N --> H
+  W --> H
+  H --> R[Containment: isolate host\nreset credentials\nreview krbtgt risk\npatch Exchange]
+        </pre>
       </div>
     </section>
 
-    <section id="mitre" class="section-padding compact alt-section">
+    <section id="mitre" class="section-padding compact">
       <div class="section-title reveal">
         <p class="eyebrow">MITRE ATT&CK mapping</p>
-        <h2>What behaviors were analyzed</h2>
+        <h2>Techniques analyzed</h2>
       </div>
       <div class="mitre-grid reveal">
-        <div><span>Initial Access</span><strong>User execution / exposed service path</strong></div>
-        <div><span>Discovery</span><strong>Network, software, domain account and group discovery</strong></div>
+        <div><span>Initial Access</span><strong>User Execution / exposed service path</strong></div>
+        <div><span>Discovery</span><strong>Network service, software, domain account and group discovery</strong></div>
         <div><span>Execution</span><strong>PowerShell and native execution paths</strong></div>
-        <div><span>Defense Evasion</span><strong>Hidden execution, obfuscation, telemetry impairment</strong></div>
-        <div><span>Persistence</span><strong>Autostart and scheduled execution concepts</strong></div>
-        <div><span>Credential Access</span><strong>Credential dumping, DCSync, and Kerberos risk analysis</strong></div>
+        <div><span>Defense Evasion</span><strong>Hidden execution, obfuscation, telemetry impairment, Defender exclusions</strong></div>
+        <div><span>Persistence</span><strong>Scheduled task and autostart concepts</strong></div>
+        <div><span>Credential Access</span><strong>LSASS dump, DCSync, Golden Ticket risk</strong></div>
         <div><span>Lateral Movement</span><strong>Remote service exploitation and alternate authentication material</strong></div>
         <div><span>Impact Story</span><strong>Exchange compromise as a path toward domain-level control</strong></div>
       </div>
     </section>
 
-    <section class="section-padding compact">
-      <div class="two-column reveal">
-        <div class="glass content-card">
-          <h2>Defensive outputs</h2>
-          <ul class="result-list">
-            <li>Registry integrity monitoring recommendations for autostart abuse.</li>
-            <li>API and call-stack visibility considerations for modern EDR.</li>
-            <li>Memory anomaly hunting for suspicious executable regions.</li>
-            <li>Application control recommendations such as WDAC/AppLocker.</li>
-            <li>Threat hunting ideas using Windows event IDs and AD replication indicators.</li>
-          </ul>
-        </div>
+    <section class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">Defensive recommendations</p>
+        <h2>What to hunt or harden</h2>
+      </div>
+      <div class="artifact-grid reveal">
+        <article class="artifact-card"><span>Registry & Tasks</span><h3>Persistence monitoring</h3><p>Monitor Run keys and scheduled task creation, especially paths under user-writable or uncommon directories.</p></article>
+        <article class="artifact-card"><span>Memory</span><h3>LSASS and private executable regions</h3><p>Alert on suspicious LSASS access and memory regions that suggest injected code.</p></article>
+        <article class="artifact-card"><span>AD</span><h3>DCSync indicators</h3><p>Hunt Event ID 4662 with replication-related rights and unexpected domain replication activity.</p></article>
+        <article class="artifact-card"><span>Exchange</span><h3>Patch and log review</h3><p>Patch Exchange, inspect IIS/Exchange logs, and monitor Remote PowerShell patterns.</p></article>
+        <article class="artifact-card"><span>Control</span><h3>AppLocker / WDAC</h3><p>Block unapproved binaries and script execution paths to reduce post-exploitation tooling.</p></article>
+        <article class="artifact-card"><span>IR</span><h3>Kerberos recovery</h3><p>If krbtgt exposure is suspected, plan credential reset and Kerberos trust recovery carefully.</p></article>
       </div>
     </section>
   </main>
 
   <footer class="site-footer"><a href="../index.html">← Back to all projects</a></footer>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
   <script src="../assets/js/app.js"></script>
 </body>
 </html>

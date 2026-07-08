@@ -1,89 +1,95 @@
-const glow = document.querySelector('.cursor-glow');
-window.addEventListener('pointermove', (event) => {
-  if (!glow) return;
-  glow.style.left = `${event.clientX}px`;
-  glow.style.top = `${event.clientY}px`;
-});
 
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach((entry) => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      observer.unobserve(entry.target);
-    }
-  });
-}, { threshold: 0.16 });
-document.querySelectorAll('.reveal').forEach((element) => observer.observe(element));
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-const navToggle = document.querySelector('.nav-toggle');
-const navLinks = document.querySelector('.nav-links');
+const navToggle = $('.nav-toggle');
+const navLinks = $('.nav-links');
 if (navToggle && navLinks) {
   navToggle.addEventListener('click', () => {
-    const open = navLinks.classList.toggle('open');
-    navToggle.setAttribute('aria-expanded', String(open));
+    navLinks.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', navLinks.classList.contains('open'));
   });
 }
 
-const capabilityData = {
-  detect: { title: 'Detection logic', desc: 'Correlating endpoint, web, network, identity, and memory artifacts into explainable alerts.' },
-  investigate: { title: 'Investigation workflow', desc: 'Building timelines from source telemetry to MITRE context and analyst-ready evidence.' },
-  respond: { title: 'Response thinking', desc: 'Designing controlled containment paths such as notification, firewall block, file removal, and endpoint isolation.' },
-  engineer: { title: 'Detection engineering', desc: 'Converting offensive behavior into rules, dashboards, detector logic, and visual playbooks.' }
-};
-document.querySelectorAll('.capability-node').forEach((node) => {
-  node.addEventListener('click', () => {
-    document.querySelectorAll('.capability-node').forEach((n) => n.classList.remove('active'));
-    node.classList.add('active');
-    const content = capabilityData[node.dataset.cap];
-    const title = document.getElementById('cap-title');
-    const desc = document.getElementById('cap-desc');
-    if (content && title && desc) { title.textContent = content.title; desc.textContent = content.desc; }
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
   });
-});
+}, { threshold: 0.12 });
+$$('.reveal').forEach(el => observer.observe(el));
 
-document.querySelectorAll('.diagram-node').forEach((node) => {
+const capData = {
+  detect: ['Detection logic', 'Correlating Windows event logs, Sysmon-style telemetry, WAF alerts, vulnerability context, and runtime artifacts into explainable findings.'],
+  investigate: ['Investigation workflow', 'Pivoting from alerts to evidence such as Event IDs, threat-intel enrichment, process behavior, memory regions, and firewall actions.'],
+  respond: ['Controlled response', 'Demonstrating safe containment through endpoint isolation, IP blocking, file deletion, and analyst documentation.'],
+  engineer: ['Detection engineering', 'Building rules, custom active-response actions, and behavioral tooling from red-team observations.']
+};
+$$('.capability-node').forEach(node => {
   node.addEventListener('click', () => {
-    const diagram = node.closest('[data-diagram]');
-    if (!diagram) return;
-    diagram.querySelectorAll('.diagram-node').forEach((n) => n.classList.remove('active'));
+    $$('.capability-node').forEach(n => n.classList.remove('active'));
     node.classList.add('active');
-    const info = diagram.querySelector('.diagram-info');
-    if (info) {
-      const h = info.querySelector('h3');
-      const p = info.querySelector('p');
-      if (h) h.textContent = node.dataset.title || node.textContent.trim();
-      if (p) p.textContent = node.dataset.desc || '';
+    const key = node.dataset.cap;
+    if (capData[key]) {
+      const title = $('#cap-title');
+      const desc = $('#cap-desc');
+      if (title) title.textContent = capData[key][0];
+      if (desc) desc.textContent = capData[key][1];
     }
   });
 });
 
-document.querySelectorAll('.tab-btn').forEach((button) => {
-  button.addEventListener('click', () => {
-    const root = button.closest('.scenario-tabs');
-    if (!root) return;
-    root.querySelectorAll('.tab-btn').forEach((btn) => btn.classList.remove('active'));
-    root.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.remove('active'));
-    button.classList.add('active');
-    const panel = root.querySelector(`#${button.dataset.tab}`);
-    if (panel) panel.classList.add('active');
+$$('.scenario-tabs').forEach(tabWrap => {
+  const buttons = $$('.tab-btn', tabWrap);
+  const panels = $$('.tab-panel', tabWrap);
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      const panel = $('#' + btn.dataset.tab, tabWrap);
+      if (panel) panel.classList.add('active');
+    });
   });
 });
 
-const canvas = document.getElementById('noise-canvas');
+const diagram = $('[data-diagram="wazuh"]');
+if (diagram) {
+  const title = $('.diagram-info h3', diagram);
+  const desc = $('.diagram-info p', diagram);
+  $$('.diagram-node', diagram).forEach(node => {
+    node.addEventListener('click', () => {
+      $$('.diagram-node', diagram).forEach(n => n.classList.remove('active'));
+      node.classList.add('active');
+      if (title) title.textContent = node.dataset.title || node.textContent;
+      if (desc) desc.textContent = node.dataset.desc || '';
+    });
+  });
+}
+
+const glow = $('.cursor-glow');
+if (glow) {
+  window.addEventListener('pointermove', (e) => {
+    glow.style.left = e.clientX + 'px';
+    glow.style.top = e.clientY + 'px';
+  });
+}
+
+const canvas = $('#noise-canvas');
 if (canvas) {
   const ctx = canvas.getContext('2d');
-  const draw = () => {
-    const ratio = window.devicePixelRatio || 1;
-    canvas.width = window.innerWidth * ratio;
-    canvas.height = window.innerHeight * ratio;
-    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    for (let i = 0; i < 90; i++) {
-      ctx.fillStyle = `rgba(83, 229, 255, ${Math.random() * 0.25})`;
-      ctx.fillRect(Math.random() * window.innerWidth, Math.random() * window.innerHeight, 1, 1);
+  function drawNoise(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const imageData = ctx.createImageData(canvas.width, canvas.height);
+    for (let i = 0; i < imageData.data.length; i += 4) {
+      const shade = Math.random() * 24;
+      imageData.data[i] = shade;
+      imageData.data[i+1] = shade;
+      imageData.data[i+2] = shade;
+      imageData.data[i+3] = 12;
     }
-  };
-  draw();
-  window.addEventListener('resize', draw);
-  setInterval(draw, 2400);
+    ctx.putImageData(imageData, 0, 0);
+  }
+  drawNoise();
+  window.addEventListener('resize', drawNoise);
 }

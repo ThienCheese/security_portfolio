@@ -26,15 +26,18 @@
         <div class="reveal">
           <p class="eyebrow">Red Team Malware Research · Windows Internals · Detection Engineering</p>
           <h1>Defender Evasion & Injection Detection</h1>
-          <p class="hero-subtitle">A red-focused lab project that built a custom process-injection loader, demonstrated Windows Defender bypass under real conditions, and then introduced a behavioral detector based on thread and memory artifacts.</p>
+          <p class="hero-subtitle">A red-focused lab project that built a controlled process-injection loader, studied Windows Defender evasion patterns, and then converted the offensive understanding into a behavioral detector based on thread and memory artifacts.</p>
           <div class="hero-actions">
             <a class="btn primary" href="#red-flow">Red flow</a>
             <a class="btn ghost" href="#detector">Detector design</a>
             <a class="btn ghost" href="https://github.com/ThienCheese/Bypass_" target="_blank" rel="noreferrer">GitHub repo</a>
           </div>
+          <div class="kpi-inline">
+            <span>Windows Internals</span><span>Native NT API</span><span>Direct syscall concept</span><span>T1055</span>
+          </div>
         </div>
         <div class="metric-stack reveal delay-1">
-          <div><strong>Bypass</strong><span>Latest Version of Windows Defender</span></div>
+          <div><strong>Bypass</strong><span>Windows Defender lab validation</span></div>
           <div><strong>6</strong><span>evasion technique groups</span></div>
           <div><strong>3</strong><span>detection engines built</span></div>
         </div>
@@ -43,17 +46,34 @@
 
     <section id="red-flow" class="section-padding compact alt-section">
       <div class="section-title reveal">
-        <p class="eyebrow">Red-team scenario</p>
+        <p class="eyebrow">Red-team research model</p>
         <h2>How the loader bypass chain was designed</h2>
-        
+        <p>The public page explains the research architecture and learning outcomes, not a step-by-step payload guide.</p>
       </div>
       <div class="red-team-grid reveal">
         <div class="story-panel safe-scope">
           <h3>Objective</h3>
-          <p>Build a custom loader that can reduce Defender visibility by avoiding obvious static indicators, bypassing user-mode API hooks, disabling selected user-mode telemetry paths, and executing a payload inside a trusted process.</p>
+          <p>Build a controlled loader that reduces Defender visibility by avoiding static indicators, resolving sensitive functions dynamically, bypassing user-mode hook assumptions, impairing selected telemetry paths, decrypting payload content at runtime, and injecting into a trusted process.</p>
           <p class="mini-heading">Result demonstrated</p>
-          <p>The full chain succeeded in the Windows 11 VM as well as a production environment desktop with Defender real-time protection enabled, while still leaving runtime artifacts that a custom detector could use.</p>
+          <p>The full chain succeeded in the lab while still leaving runtime artifacts: new thread creation and private executable memory inside the target process. Those artifacts became the basis for the custom detector.</p>
         </div>
+        <div class="mermaid-card">
+          <pre class="mermaid">
+flowchart TB
+  A[Start loader] --> B[Anti-sandbox timing check]
+  B --> C[Decrypt hidden strings]
+  C --> D[Load ntdll / kernel32 context]
+  D --> E[Resolve NT API + extract SSN]
+  E --> F[Build syscall stubs in memory]
+  F --> G[Patch selected user-mode telemetry paths]
+  G --> H[Read encrypted payload data]
+  H --> I[Rolling XOR decrypt in memory]
+  I --> J[Find trusted target process]
+  J --> K[Open process + allocate + write + protect]
+  K --> L[Create remote thread]
+          </pre>
+        </div>
+      </div>
     </section>
 
     <section class="section-padding compact">
@@ -62,72 +82,79 @@
         <h2>What each technique shows</h2>
       </div>
       <div class="tech-stack reveal">
-        <article class="tech-card"><span>01</span><h3>Window hiding</h3><p>Shows awareness of user-facing artifacts and process stealth at execution time.</p></article>
-        <article class="tech-card"><span>02</span><h3>PEB walk + API hashing</h3><p>Explains how static imports and suspicious strings can be removed from the binary view.</p></article>
-        <article class="tech-card"><span>03</span><h3>Direct syscall path</h3><p>Demonstrates why user-mode hook-only defenses can miss lower-level behavior.</p></article>
-        <article class="tech-card"><span>04</span><h3>AMSI / ETW bypass concept</h3><p>Shows how security telemetry can be impaired and why defenders need multiple signals.</p></article>
-        <article class="tech-card"><span>05</span><h3>Rolling XOR payload</h3><p>Highlights why static pattern matching alone is weak against dynamic decryption.</p></article>
-        <article class="tech-card"><span>06</span><h3>In-memory execution</h3><p>Demonstrates process injection into a legitimate process rather than running a visible standalone payload.</p></article>
+        <article class="tech-card"><span>01</span><h3>Anti-sandbox delay</h3><p>Measures timing behavior to avoid running the chain when sleep is skipped or emulation is abnormal.</p></article>
+        <article class="tech-card"><span>02</span><h3>XOR string hiding</h3><p>Decrypts sensitive strings at runtime to reduce plain-text indicators and simple static rules.</p></article>
+        <article class="tech-card"><span>03</span><h3>Rolling XOR payload</h3><p>Stores payload data encrypted and decrypts it only in memory immediately before execution.</p></article>
+        <article class="tech-card"><span>04</span><h3>SSN extraction</h3><p>Reads the NT function prologue to identify the System Service Number needed for direct syscall stubs.</p></article>
+        <article class="tech-card"><span>05</span><h3>Direct syscall stubs</h3><p>Creates small in-memory syscall dispatchers to reduce reliance on user-mode hooked API paths.</p></article>
+        <article class="tech-card"><span>06</span><h3>AMSI / ETW impairment</h3><p>Demonstrates why defenders should not rely on a single telemetry channel or hook layer.</p></article>
+        <article class="tech-card"><span>07</span><h3>Trusted process target</h3><p>Locates a common user process and injects into it to reduce the visibility of a standalone suspicious process.</p></article>
+        <article class="tech-card"><span>08</span><h3>Remote thread execution</h3><p>Uses the classic final artifact of process injection: a new thread begins execution from injected memory.</p></article>
+        <article class="tech-card"><span>09</span><h3>Blue-team translation</h3><p>Turns offensive research into detector logic focused on memory type and thread start address.</p></article>
       </div>
     </section>
 
     <section class="section-padding compact alt-section">
       <div class="section-title reveal">
         <p class="eyebrow">Experiment timeline</p>
-        <h2>From blocked injection to successful evasion</h2>
+        <h2>From blocked injection to behavioral detection</h2>
       </div>
       <div class="attack-timeline reveal">
-        <div class="timeline-item"><strong>Test 1</strong><div><h3>Classic Windows API injection</h3><p>Baseline attempt using the common pattern of allocating memory, writing payload, changing permissions, and creating a remote thread. Defender blocked this path in the lab.</p></div></div>
-        <div class="timeline-item"><strong>Test 2</strong><div><h3>Direct syscall without full telemetry impairment</h3><p>User-mode hook visibility was reduced, but kernel-level and heuristic signals still provided enough detection opportunity.</p></div></div>
-        <div class="timeline-item"><strong>Test 3</strong><div><h3>Full evasion chain</h3><p>Anti-sandbox, dynamic resolution, telemetry impairment, payload encryption, and injection were combined. The payload executed successfully in the lab environment.</p></div></div>
-        <div class="timeline-item"><strong>Blue</strong><div><h3>Detector validation</h3><p>The same attack still left runtime traces: a new thread and executable private memory inside the target process.</p></div></div>
+        <div class="timeline-item"><strong>Test 1</strong><div><h3>Classic Windows API injection</h3><p>Baseline pattern: allocate memory, write payload, change protection, create remote thread. This path was easier for Defender to block or flag.</p></div></div>
+        <div class="timeline-item"><strong>Test 2</strong><div><h3>Native NT API and syscall path</h3><p>The loader reduced user-mode API visibility by resolving NT functions and dispatching through direct syscall concepts.</p></div></div>
+        <div class="timeline-item"><strong>Test 3</strong><div><h3>Full evasion chain</h3><p>Anti-sandbox checks, string/payload encryption, telemetry impairment, and process injection were combined to achieve execution in the lab.</p></div></div>
+        <div class="timeline-item"><strong>Blue</strong><div><h3>Detector validation</h3><p>The attack still left behavioral traces: a new thread and executable private memory inside a trusted target process.</p></div></div>
       </div>
     </section>
 
     <section id="detector" class="section-padding compact">
       <div class="section-title reveal">
         <p class="eyebrow">Detector architecture</p>
-        <h2>Turning offensive understanding into detection</h2>
-        <p>The detector does not try to catch the API call itself. It inspects the aftermath of injection: thread start address and memory region type.</p>
+        <h2>Turning offensive knowledge into detection</h2>
+        <p>The detector does not try to catch the API call itself. It inspects the aftermath of injection: process/thread changes, thread start address, and memory region type.</p>
       </div>
       <div class="engine-grid reveal">
         <article class="engine-card">
           <span>Engine 1</span>
           <h3>ETW Kernel Trace</h3>
-          <p>Observes process events to provide context around parent-child relationships and suspicious process activity.</p>
+          <p>Observes process events to add context around parent-child relationships and suspicious activity in high-value processes.</p>
         </article>
         <article class="engine-card featured">
           <span>Engine 2</span>
           <h3>Thread Polling</h3>
-          <p>Compares thread snapshots, detects new threads in sensitive processes, and checks whether the start address points to suspicious executable memory.</p>
+          <p>Builds a thread baseline, detects new threads in existing processes, queries their start address, and checks whether they begin inside suspicious executable memory.</p>
         </article>
         <article class="engine-card">
           <span>Engine 3</span>
           <h3>Memory Scanner</h3>
-          <p>Scans target processes for committed private executable regions that are not backed by a legitimate image file.</p>
+          <p>Scans target processes for committed private executable regions that are not backed by normal image files.</p>
         </article>
+      </div>
+      <div class="mermaid-card reveal" style="margin-top:18px;">
+        <pre class="mermaid">
+flowchart LR
+  A[Baseline processes and threads] --> B[Detect new thread in monitored process]
+  B --> C[Query Win32 thread start address]
+  C --> D[VirtualQueryEx memory region]
+  D --> E{Region type and protection}
+  E -->|MEM_IMAGE| F[Likely normal module-backed code]
+  E -->|MEM_PRIVATE + EXECUTE| G[High-confidence injection artifact]
+  G --> H[Alert T1055]
+  H --> I{Lab mode}
+  I -->|Alert only| J[Print evidence]
+  I -->|Alert + kill| K[Terminate target process if safe]
+        </pre>
       </div>
     </section>
 
     <section class="section-padding compact alt-section">
       <div class="section-title reveal">
-        <p class="eyebrow">Detection flowchart</p>
-        <h2>How the tool reasons about injection</h2>
+        <p class="eyebrow">Detection logic</p>
+        <h2>Why MEM_PRIVATE matters</h2>
       </div>
-      <div class="flowchart horizontal reveal" style="--steps:6">
-        <div class="flow-step"><b>01</b><h3>Build baseline</h3><p>Collect known process and thread state.</p></div>
-        <div class="flow-step"><b>02</b><h3>Watch for new thread</h3><p>Identify thread IDs that appear after baseline.</p></div>
-        <div class="flow-step"><b>03</b><h3>Query start address</h3><p>Inspect where the new thread begins executing.</p></div>
-        <div class="flow-step"><b>04</b><h3>Inspect memory type</h3><p>Check whether the address belongs to a private executable region.</p></div>
-        <div class="flow-step"><b>05</b><h3>Confirm with memory scan</h3><p>Search for MEM_PRIVATE + executable pages in sensitive targets.</p></div>
-        <div class="flow-step"><b>06</b><h3>Alert / block</h3><p>Raise a high-confidence T1055 signal and optionally terminate in the lab.</p></div>
-      </div>
-    </section>
-
-    <section class="section-padding compact">
       <div class="detector-summary reveal">
         <div class="glass content-card">
-          <h2>Why MEM_PRIVATE matters</h2>
+          <h2>Memory reasoning</h2>
           <div class="memory-visual">
             <div class="memory-bar image"><span>MEM_IMAGE</span><small>Normal code loaded from EXE/DLL</small></div>
             <div class="memory-bar private pulse"><span>MEM_PRIVATE + EXECUTE</span><small>Suspicious for injected shellcode</small></div>
@@ -135,15 +162,22 @@
           </div>
         </div>
         <div class="glass content-card">
-          <h2>Limitations and next steps</h2>
-          <p>Current detection focuses on private executable memory and classic remote thread patterns. Future work should cover module stomping, process hollowing, APC injection, call stack analysis, and event-driven monitoring for lower latency.</p>
-          <div class="badge-row"><span>T1055</span><span>MEM_PRIVATE</span><span>Thread start address</span><span>Windows Internals</span></div>
+          <h2>Detection conditions</h2>
+          <ul class="result-list">
+            <li>New thread appears in an existing target process.</li>
+            <li>Thread start address points to a committed private region.</li>
+            <li>Memory protection is executable, especially RWX or large executable private regions.</li>
+            <li>Target process is high-value or commonly abused, such as explorer.exe, svchost.exe, browser, shell, or security-sensitive processes.</li>
+          </ul>
+          <div class="badge-row"><span>T1055</span><span>MEM_PRIVATE</span><span>Thread start address</span><span>VirtualQueryEx</span><span>NtQueryInformationThread</span></div>
         </div>
       </div>
     </section>
   </main>
 
   <footer class="site-footer"><a href="../index.html">← Back to all projects</a></footer>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'default' });</script>
   <script src="../assets/js/app.js"></script>
 </body>
 </html>
