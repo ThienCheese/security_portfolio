@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Extra portfolio page for Nguyễn Thiện Chí's Fedora Hyprland desktop customization: Linux, Wayland, dotfiles, automation, and workflow design." />
+  <title>Fedora Hyprland Customization | Security Portfolio</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body data-page="project">
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <canvas id="noise-canvas" aria-hidden="true"></canvas>
+
+  <header class="site-header glass">
+    <a class="brand" href="../index.html"><span class="brand-mark">TC</span><span class="brand-text">Thiện Chí</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-label="Open navigation">☰</button>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="../index.html#projects">Projects</a>
+      <a href="wazuh-xdr.html">Wazuh XDR</a>
+      <a href="proxynotshell.html">ProxyNotShell</a>
+      <a href="process-injection.html">Process Injection</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="project-hero section-padding">
+      <div class="breadcrumb"><a href="../index.html">Home</a> / Extra / Hyprland</div>
+      <div class="project-hero-grid">
+        <div class="reveal">
+          <p class="eyebrow">Extra · Linux customization · Daily-driver workflow</p>
+          <h1>Fedora Hyprland Desktop Customization</h1>
+          <p class="hero-subtitle">A personal Linux customization project showing my interest in building a fast, polished, and automated daily-driver environment.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#showcase">View screenshots</a>
+            <a class="btn ghost" href="#video">Watch demo video</a>
+            <a class="btn ghost" href="https://github.com/ThienCheese/hyprland" target="_blank" rel="noreferrer">Dotfiles GitHub</a>
+          </div>
+          <div class="trust-row" aria-label="Highlights">
+            <span>Fedora Linux</span>
+            <span>Hyprland</span>
+            <span>Waybar</span>
+            <span>SwayNC</span>
+            <span>Fish Shell</span>
+          </div>
+        </div>
+        <div class="extra-hero-shot reveal delay-1">
+          <img src="../assets/images/hyprland/hyprland-clean-workspace.png" alt="Clean Fedora Hyprland workspace with terminal and notification center." />
+        </div>
+      </div>
+    </section>
+
+    <section class="section-padding compact alt-section">
+      <div class="two-column reveal">
+        <article class="story-panel">
+          <h3>What I built</h3>
+          <ul class="detail-list">
+            <li>A Fedora-based Wayland desktop using Hyprland as the compositor.</li>
+            <li>Dynamic color theming where the wallpaper palette propagates across the bar, notification center, and terminal workflow.</li>
+            <li>A GNOME-like control center and notification workflow using SwayNC.</li>
+            <li>A music workflow using MPD/rmpc and Fish shell automation for local music management.</li>
+            <li>A screen-sharing friendly Wayland setup using PipeWire and xdg-desktop-portal-hyprland.</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+  <section id="video" class="section-padding compact">
+    <div class="section-title reveal">
+        <p class="eyebrow">Video Showcase</p>
+        <h2>Hyprland Desktop Demo</h2>
+        <p>
+            A short demonstration of my customized Fedora + Hyprland environment,
+            including dynamic theming, launcher, notification center, power menu,
+            terminal workflow, and multimedia setup.
+        </p>
+    </div>
+
+    <div class="video-card reveal">
+
+        <video
+            controls
+            preload="metadata"
+            poster="../assets/images/hyprland-cover.png"
+            playsinline>
+
+            <source src="../assets/videos/video.mp4" type="video/mp4">
+
+            Your browser does not support HTML5 video.
+        </video>
+
+        <div class="hero-actions">
+            <a class="btn ghost"
+               href="../assets/videos/video.mp4"
+               target="_blank">
+               Download Video
+            </a>
+
+            <a class="btn primary"
+               href="https://github.com/ThienCheese/hyprland"
+               target="_blank">
+               View Dotfiles
+            </a>
+        </div>
+
+    </div>
+</section>
+
+    <section id="showcase" class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">Visual showcase</p>
+        <h2>Screenshots</h2>
+        <p>The screenshots are selected to show different parts of the environment: clean workspace, launcher, control center, terminal, and music workflow.</p>
+      </div>
+      <div class="hypr-gallery reveal">
+        <article class="hypr-shot">
+          <figure>
+            <img src="../assets/images/hyprland/hyprland-clean-workspace.png" alt="Hyprland clean workspace with terminal and SwayNC notification center." />
+            <figcaption><strong>Clean workspace:</strong> Fedora + Hyprland daily-driver view with terminal, themed notification center, and transparent Wayland UI elements.</figcaption>
+          </figure>
+        </article>
+        <article class="hypr-shot">
+          <figure>
+            <img src="../assets/images/hyprland/hyprland-control-center.png" alt="Hyprland control center view with logout, suspend, shutdown, and reboot actions." />
+            <figcaption><strong>Session controls:</strong> a large, polished control overlay for logout, suspend, shutdown, and reboot actions.</figcaption>
+          </figure>
+        </article>
+        <article class="hypr-shot">
+          <figure>
+            <img src="../assets/images/hyprland/hyprland-launcher-terminal.png" alt="Hyprland desktop showing terminal file manager and application launcher." />
+            <figcaption><strong>Launcher and terminal workflow:</strong> app launcher, terminal-first navigation, and file/music browsing in a customized workspace.</figcaption>
+          </figure>
+        </article>
+        <article class="hypr-shot">
+          <figure>
+            <img src="../assets/images/hyprland/hyprland-music-rmpc.png" alt="Hyprland desktop showing rmpc music player with album art and queue." />
+            <figcaption><strong>Music workflow:</strong> MPD/rmpc setup with a visual queue, album art, and wallpaper-aware color palette.</figcaption>
+          </figure>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-padding compact">
+      <div class="section-title reveal">
+        <p class="eyebrow">System components</p>
+        <h2>Stack overview</h2>
+      </div>
+      <div class="component-grid reveal">
+        <article class="component-card"><span>OS</span><p>Fedora Linux as the base system for a modern desktop environment.</p></article>
+        <article class="component-card"><span>Compositor</span><p>Hyprland for a fast Wayland workflow with custom window rules and animations.</p></article>
+        <article class="component-card"><span>Status / control</span><p>Waybar and SwayNC for system status, notification center, and control widgets.</p></article>
+        <article class="component-card"><span>Theming</span><p>Wallust dynamic colors to sync UI palette with the active wallpaper.</p></article>
+        <article class="component-card"><span>Shell</span><p>Fish shell for an interactive terminal workflow and small automation scripts.</p></article>
+        <article class="component-card"><span>Audio / media</span><p>PipeWire, WirePlumber, MPD, and rmpc for audio and music management.</p></article>
+        <article class="component-card"><span>Screen sharing</span><p>xdg-desktop-portal-hyprland configured for Wayland screen capture.</p></article>
+        <article class="component-card"><span>Dotfiles</span><p>Repository-based configuration to keep the environment reproducible.</p></article>
+      </div>
+    </section>
+
+    <section class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">Workflow map</p>
+        <h2>How the setup fits together</h2>
+      </div>
+      <div class="mermaid-card reveal">
+        <pre class="mermaid">
+flowchart LR
+  A[Fedora Linux] --> B[Hyprland<br/>Wayland compositor]
+  B --> C[Waybar<br/>status modules]
+  B --> D[SwayNC<br/>notifications + controls]
+  B --> E[Kitty + Fish<br/>terminal workflow]
+  B --> F[Wallust<br/>dynamic palette]
+  F --> C
+  F --> D
+  F --> E
+  E --> G[MPD / rmpc<br/>music workflow]
+  B --> H[PipeWire + portal<br/>screen sharing]
+        </pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><a href="../index.html">← Back to portfolio</a></footer>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      securityLevel: 'loose',
+      flowchart: { useMaxWidth: false, htmlLabels: true, nodeSpacing: 55, rankSpacing: 70, padding: 20, curve: 'basis' },
+      themeVariables: {
+        fontFamily: 'Inter, Arial, sans-serif',
+        fontSize: '17px',
+        primaryColor: '#f4f0ff',
+        primaryTextColor: '#1f2430',
+        primaryBorderColor: '#9b7cff',
+        lineColor: '#3b4154'
+      }
+    });
+  </script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>

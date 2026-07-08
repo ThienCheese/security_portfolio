@@ -551,8 +551,107 @@ h3 { font-size: 1.2rem; letter-spacing: -0.02em; }
 @media (max-width: 980px) { .case-grid { grid-template-columns: 1fr; } }
 
 
+/* ===== Hyprland extra page ===== */
+.extra-grid {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 18px;
+  align-items: start;
+}
+.extra-hero-shot {
+  border-radius: 28px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.05);
+  box-shadow: var(--shadow);
+}
+.extra-hero-shot img,
+.hypr-shot img {
+  width: 100%;
+  display: block;
+}
+.hypr-gallery {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.hypr-shot {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255,255,255,0.085), rgba(255,255,255,0.04));
+  box-shadow: var(--shadow);
+}
+.hypr-shot figure { margin: 0; }
+.hypr-shot figcaption {
+  padding: 14px 16px 16px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+.video-card {
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(154,124,255,0.12), rgba(255,255,255,0.04));
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+.video-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(3,9,15,0.65);
+}
+.video-frame iframe,
+.video-frame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  object-fit: cover;
+}
+.component-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.component-card {
+  border-radius: 22px;
+  border: 1px solid var(--line);
+  background: rgba(3,9,15,0.45);
+  padding: 18px;
+}
+.component-card span {
+  display: block;
+  color: var(--orange);
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+.component-card p { margin: 0; font-size: 0.92rem; }
+.extra-note {
+  border-left: 4px solid var(--green);
+  padding-left: 16px;
+  color: var(--muted);
+}
+.card-icon.extra { background: var(--orange); color: #06131d; }
+
+
+
 .mermaid-card svg {
   display: block;
   justify-self: center;
   margin: 0 auto;
+}
+
+.video-card video{
+    width:100%;
+    border-radius:20px;
+    display:block;
+
+    border:1px solid rgba(255,255,255,.08);
+
+    box-shadow:0 20px 60px rgba(0,0,0,.45);
 }
