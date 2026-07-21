@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Self-hosted DNS Firewall and secure DNS gateway built with Python, Docker Compose, Caddy, Cloudflare Tunnel, DNS-over-HTTPS, sinkholing, logging, and automated blacklist updates." />
+  <title>DNS Firewall & Secure DNS Gateway | Security Portfolio</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body data-page="project">
+  <div class="cursor-glow" aria-hidden="true"></div>
+  <canvas id="noise-canvas" aria-hidden="true"></canvas>
+
+  <header class="site-header glass">
+    <a class="brand" href="../index.html"><span class="brand-text">Nguyễn Thiện Chí</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-label="Open navigation">☰</button>
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="../index.html#projects">Projects</a>
+      <a href="wazuh-xdr.html">Wazuh XDR</a>
+      <a href="proxynotshell.html">ProxyNotShell</a>
+      <a href="process-injection.html">Process Injection</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="project-hero section-padding">
+      <div class="breadcrumb"><a href="../index.html">Home</a> / DNS Firewall</div>
+      <div class="project-hero-grid">
+        <div class="reveal">
+          <p class="eyebrow">DNS Security · Linux · Network Engineering</p>
+          <h1>Self-Hosted DNS Firewall & Secure DNS Gateway</h1>
+          <p class="hero-subtitle">
+            A containerized DNS security platform that filters advertising, tracking, phishing, and malicious domains for an entire local network. The project combines a Python DNS service, automated threat-list updates, DNS sinkholing, query analytics, Caddy, Docker Compose, and Cloudflare Tunnel for encrypted remote access through DNS-over-HTTPS.
+          </p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#architecture">Explore architecture</a>
+            <a class="btn ghost" href="https://github.com/ThienCheese/nt140firewall" target="_blank" rel="noreferrer">View source on GitHub</a>
+          </div>
+          <div class="kpi-inline">
+            <span>Python DNS Server</span>
+            <span>Docker Compose</span>
+            <span>DNS Sinkhole</span>
+            <span>DoH</span>
+            <span>Cloudflare Tunnel</span>
+          </div>
+        </div>
+
+        <div class="metric-stack reveal delay-1">
+          <div><strong>LAN + Remote</strong><span>network-wide filtering at home and encrypted DNS access outside the LAN</span></div>
+          <div><strong>24-hour</strong><span>automatic blacklist refresh cycle</span></div>
+          <div><strong>No inbound ports</strong><span>remote access through an outbound Cloudflare Tunnel</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="architecture" class="section-padding compact">
+      <div class="section-title reveal">
+        <p class="eyebrow">Architecture</p>
+        <h2>One filtering engine, two access paths</h2>
+        <p>
+          Local devices resolve through the server on port 53, while remote devices use an HTTPS endpoint exposed through Cloudflare Tunnel. Both paths reach the same filtering, forwarding, logging, and policy layer.
+        </p>
+      </div>
+
+      <div class="mermaid-card reveal">
+        <pre class="mermaid">
+flowchart TB
+  subgraph REMOTE["Remote clients"]
+    MOB["Android / iOS<br/>4G, 5G, public Wi-Fi"]
+  end
+
+  subgraph EDGE["Cloud edge"]
+    CF["Cloudflare Edge<br/>TLS termination"]
+    TUN["Cloudflare Tunnel<br/>outbound-only connection"]
+  end
+
+  subgraph LAN["Home network"]
+    DEV["PCs, phones, IoT"]
+    RTR["Router / DHCP<br/>DNS points to local server"]
+  end
+
+  subgraph HOST["Ubuntu server / VM"]
+    CADDY["Caddy<br/>reverse proxy + authentication"]
+    DNS["Python DNS Server<br/>filter + forward + log"]
+    BL["Blacklist engine<br/>daily source synchronization"]
+    LOG["Dashboard & query statistics"]
+    UP["Upstream DNS<br/>1.1.1.1 / 1.0.0.1"]
+  end
+
+  MOB -->|"DNS-over-HTTPS"| CF
+  CF --> TUN
+  TUN --> CADDY
+  DEV --> RTR
+  RTR -->|"Plain DNS / port 53"| DNS
+  CADDY -->|"/dns-query"| DNS
+  BL --> DNS
+  DNS -->|"blocked domain"| SINK["Sinkhole response<br/>127.0.0.1"]
+  DNS -->|"allowed domain"| UP
+  DNS --> LOG
+        </pre>
+      </div>
+
+      <div class="detail-grid reveal" style="margin-top:18px;">
+        <article class="section-card">
+          <p class="case-kicker">LAN path</p>
+          <h3>Automatic protection for every client</h3>
+          <p>
+            The Ubuntu host uses a static LAN address. The router advertises that address as the primary DNS server through DHCP, allowing connected devices to use the firewall without installing individual agents.
+          </p>
+        </article>
+        <article class="section-card">
+          <p class="case-kicker">Remote path</p>
+          <h3>Encrypted access without public exposure</h3>
+          <p>
+            Cloudflared creates an outbound tunnel to Cloudflare. Remote clients send DNS-over-HTTPS requests to the project domain, avoiding static public IP requirements and inbound router port forwarding.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">Request lifecycle</p>
+        <h2>How one DNS query is evaluated</h2>
+      </div>
+
+      <div class="pipeline reveal dns-pipeline">
+        <div class="pipe-step"><span>01</span><h3>Receive</h3><p>Accept a LAN DNS request or a remote DoH request forwarded by Caddy.</p></div>
+        <div class="pipe-step"><span>02</span><h3>Normalize</h3><p>Extract and normalize the queried domain before policy evaluation.</p></div>
+        <div class="pipe-step"><span>03</span><h3>Evaluate</h3><p>Compare the domain against local and synchronized blacklist entries.</p></div>
+        <div class="pipe-step"><span>04</span><h3>Resolve</h3><p>Return a sinkhole address for blocked domains or forward allowed queries upstream.</p></div>
+        <div class="pipe-step"><span>05</span><h3>Record</h3><p>Store query status and expose totals, blocked rate, and domain trends in the dashboard.</p></div>
+      </div>
+    </section>
+
+    <section id="capabilities" class="section-padding compact">
+      <div class="section-title reveal">
+        <p class="eyebrow">Security capabilities</p>
+        <h2>What the platform provides</h2>
+      </div>
+
+      <div class="tech-stack reveal">
+        <article class="tech-card">
+          <span>01 · DNS policy enforcement</span>
+          <h3>Blacklist-based filtering</h3>
+          <p>Blocks domains associated with advertisements, trackers, phishing, malware, and unwanted content before application traffic is established.</p>
+        </article>
+        <article class="tech-card">
+          <span>02 · Threat prevention</span>
+          <h3>DNS sinkholing</h3>
+          <p>Returns a controlled local address for blocked domains, interrupting resolution and reducing exposure to known malicious infrastructure.</p>
+        </article>
+        <article class="tech-card">
+          <span>03 · Privacy</span>
+          <h3>DNS-over-HTTPS</h3>
+          <p>Protects remote DNS traffic from casual interception and manipulation while clients are outside the trusted home network.</p>
+        </article>
+        <article class="tech-card">
+          <span>04 · Operations</span>
+          <h3>Automated list updates</h3>
+          <p>Synchronizes block sources every 24 hours to keep filtering policy current without requiring manual rule maintenance.</p>
+        </article>
+        <article class="tech-card">
+          <span>05 · Visibility</span>
+          <h3>Query logging and dashboard</h3>
+          <p>Tracks total queries, blocked requests, block rate, frequently queried domains, and frequently blocked domains.</p>
+        </article>
+        <article class="tech-card">
+          <span>06 · Deployment</span>
+          <h3>Containerized services</h3>
+          <p>Separates DNS, proxy, and tunnel components with Docker Compose for repeatable deployment, troubleshooting, and recovery.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">Implementation</p>
+        <h2>Technology responsibilities</h2>
+      </div>
+
+      <div class="artifact-grid reveal">
+        <article class="artifact-card">
+          <span>Python</span>
+          <h3>DNS processing engine</h3>
+          <p>Receives DNS requests, applies filtering logic, produces sinkhole responses, forwards allowed domains, and records query results.</p>
+        </article>
+        <article class="artifact-card">
+          <span>Docker Compose</span>
+          <h3>Service orchestration</h3>
+          <p>Builds and operates the DNS service, Caddy, and cloudflared as an integrated but independently observable stack.</p>
+        </article>
+        <article class="artifact-card">
+          <span>Caddy</span>
+          <h3>HTTPS gateway</h3>
+          <p>Routes the dashboard and <code>/dns-query</code> endpoint while protecting administration with authenticated access.</p>
+        </article>
+        <article class="artifact-card">
+          <span>Cloudflare Tunnel</span>
+          <h3>Remote connectivity</h3>
+          <p>Publishes the web and DoH service through an outbound encrypted connection, including support for CGNAT environments.</p>
+        </article>
+        <article class="artifact-card">
+          <span>Netplan + Router DHCP</span>
+          <h3>LAN integration</h3>
+          <p>Provides a stable server address and distributes the DNS firewall automatically to clients connected to the network.</p>
+        </article>
+        <article class="artifact-card">
+          <span>Threat lists</span>
+          <h3>Policy sources</h3>
+          <p>Supports synchronized sources such as StevenBlack, OISD, and Hagezi, plus manually managed blacklist entries.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="deployment" class="section-padding compact">
+      <div class="section-title reveal">
+        <p class="eyebrow">Deployment workflow</p>
+        <h2>From clean Ubuntu host to working gateway</h2>
+      </div>
+
+      <div class="attack-timeline reveal">
+        <article class="timeline-item">
+          <strong>Step 01</strong>
+          <div><h3>Prepare the Linux server</h3><p>Deploy Ubuntu or Debian, configure bridged networking where applicable, assign a static address through Netplan, and validate gateway connectivity.</p></div>
+        </article>
+        <article class="timeline-item">
+          <strong>Step 02</strong>
+          <div><h3>Deploy the containers</h3><p>Install Docker and Docker Compose, configure environment variables, create the Caddy password hash, and start the stack with a reproducible Compose workflow.</p></div>
+        </article>
+        <article class="timeline-item">
+          <strong>Step 03</strong>
+          <div><h3>Connect Cloudflare</h3><p>Create a Zero Trust tunnel and route the public hostname to Caddy so the dashboard and DoH endpoint are accessible without exposing the home router.</p></div>
+        </article>
+        <article class="timeline-item">
+          <strong>Step 04</strong>
+          <div><h3>Integrate the LAN</h3><p>Configure the router DHCP DNS option to point clients to the local DNS server and renew client leases.</p></div>
+        </article>
+        <article class="timeline-item">
+          <strong>Step 05</strong>
+          <div><h3>Validate and benchmark</h3><p>Use <code>nslookup</code>, <code>dig</code>, <code>curl</code>, or <code>kdig</code> to verify allowed and blocked responses; use <code>dnsperf</code> for performance testing.</p></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="section-padding compact alt-section">
+      <div class="section-title reveal">
+        <p class="eyebrow">Validation</p>
+        <h2>Tests</h2>
+      </div>
+
+      <div class="evidence-layout reveal">
+        <div class="story-panel">
+          <h3>Functional checks</h3>
+          <ul class="detail-list">
+            <li><strong>Allowed lookup:</strong> query a legitimate domain against the local server and confirm a valid upstream response.</li>
+            <li><strong>Blocked lookup:</strong> query a blacklisted advertising domain and confirm the sinkhole address is returned.</li>
+            <li><strong>Remote DoH:</strong> send a request to the public <code>/dns-query</code> endpoint and validate the DNS response.</li>
+            <li><strong>Client assignment:</strong> verify that DHCP clients receive the firewall address as their resolver.</li>
+            <li><strong>Operational status:</strong> inspect container health and service logs during troubleshooting.</li>
+          </ul>
+        </div>
+
+        <div class="story-panel">
+          <h3>Example verification commands</h3>
+          <code class="code-lite">nslookup google.com 192.168.1.100
+
+nslookup ads.google.com 192.168.1.100
+
+curl -H "accept: application/dns-json" \
+"https://dns.example.com/dns-query?name=google.com&type=A"
+
+docker compose ps
+docker compose logs -f</code>
+        </div>
+      </div>
+    </section>
+
+
+      <div class="hero-actions reveal" style="margin-top:28px;">
+        <a class="btn primary" href="https://github.com/ThienCheese/nt140firewall" target="_blank" rel="noreferrer">Review repository</a>
+        <a class="btn ghost" href="../index.html#projects">Back to projects</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a href="../index.html">← Back to all projects</a>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'base',
+      securityLevel: 'loose',
+      flowchart: {
+        useMaxWidth: false,
+        htmlLabels: true,
+        nodeSpacing: 55,
+        rankSpacing: 70,
+        padding: 20,
+        curve: 'basis'
+      },
+      themeVariables: {
+        fontFamily: 'Inter, Arial, sans-serif',
+        fontSize: '17px',
+        primaryColor: '#f4f0ff',
+        primaryTextColor: '#1f2430',
+        primaryBorderColor: '#9b7cff',
+        lineColor: '#3b4154'
+      }
+    });
+  </script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>

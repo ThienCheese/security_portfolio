@@ -655,3 +655,37 @@ h3 { font-size: 1.2rem; letter-spacing: -0.02em; }
 
     box-shadow:0 20px 60px rgba(0,0,0,.45);
 }
+
+/* ===== DNS Firewall project page ===== */
+.dns-pipeline .pipe-step {
+  min-height: 215px;
+}
+
+.dns-pipeline .pipe-step:nth-child(3) {
+  border-color: rgba(255,184,107,0.34);
+  background: linear-gradient(180deg, rgba(255,184,107,0.13), rgba(3,9,15,0.5));
+}
+
+.dns-pipeline .pipe-step:nth-child(4) {
+  border-color: rgba(101,255,167,0.3);
+}
+
+.project-card h3 {
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 921px) {
+  #projects .project-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #projects .project-card {
+    min-height: 390px;
+  }
+}
+
+@media (max-width: 720px) {
+  .dns-pipeline .pipe-step {
+    min-height: auto;
+  }
+}
